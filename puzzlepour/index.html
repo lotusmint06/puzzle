@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Pour 🧪</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #fff9f0; --board-bg: #f0e6d3; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 12px 16px 24px;
+    overflow-x: hidden;
+  }
+
+  .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: #ff6b6b; top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: #4d96ff; top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: #6bcb77; bottom: -30px; left: 30%; animation-delay: 4s; }
+  @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+
+  .game-wrapper {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px;
+    width: 100%; max-width: 480px;
+  }
+
+  .header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+  .title {
+    font-size: clamp(26px, 7vw, 40px); font-weight: 900; letter-spacing: -1px; line-height: 1;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #4d96ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .stats { display: flex; gap: 8px; }
+  .stat-box {
+    background: #4d96ff; border-radius: 12px; padding: 6px 14px;
+    text-align: center; color: white; box-shadow: 0 3px 0 #2a70d4; min-width: 68px;
+  }
+  .stat-label { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; white-space: nowrap; }
+  .stat-value { font-size: 20px; font-weight: 900; line-height: 1.2; }
+
+  .controls { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
+  .diff-row { display: flex; gap: 5px; }
+  .diff-btn {
+    background: #e8d8c0; color: #8b6914; border: none; border-radius: 8px;
+    padding: 6px 12px; font-family: 'Nunito', sans-serif; font-size: 12px;
+    font-weight: 800; cursor: pointer; white-space: nowrap;
+  }
+  .diff-btn.active { background: #4d96ff; color: white; box-shadow: 0 3px 0 #2a70d4; }
+
+  .btn {
+    background: #ff6b6b; color: white; border: none; border-radius: 10px;
+    padding: 8px 16px; font-family: 'Nunito', sans-serif; font-size: 13px;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #c43c3c;
+    white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+
+  /* Board */
+  .board-outer {
+    position: relative; width: 100%;
+    background: var(--board-bg); border-radius: 20px;
+    padding: 20px 16px;
+    box-shadow: 0 6px 0 #d4c2a8, 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  #tubeContainer {
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* Tube */
+  .tube-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .tube-wrap:hover { transform: translateY(-5px); }
+  .tube-wrap.sel { transform: translateY(-8px); }
+  .tube-wrap.sel .tube-glass {
+    border-color: rgba(255,255,255,0.85);
+    box-shadow: 0 0 0 2.5px #4d96ff, 0 4px 16px rgba(77,150,255,0.3);
+  }
+
+  .tube-cap {
+    width: 100%;
+    height: 7px;
+    border: 2.5px solid rgba(180,160,130,0.55);
+    border-bottom: none;
+    border-radius: 5px 5px 0 0;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .tube-glass {
+    width: 100%;
+    aspect-ratio: 1 / 3.2;
+    border: 2.5px solid rgba(180,160,130,0.45);
+    border-top: none;
+    border-radius: 0 0 999px 999px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    background: rgba(255,255,255,0.07);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .segment {
+    flex: 1;
+    transition: transform 0.18s ease;
+    margin: 0 2px;
+  }
+  .segment:last-child { margin-bottom: 2px; }
+  .segment.empty { background: transparent; }
+  .segment.lifted { transform: translateY(-7px); }
+
+  /* Animations */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-5px); }
+    40%     { transform: translateX(5px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+  }
+  .tube-wrap.shake { animation: shake 0.35s ease; }
+
+  /* Overlay */
+  .overlay {
+    position: absolute; inset: 0; border-radius: 20px;
+    background: rgba(240,220,200,0.93);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .overlay-emoji { font-size: 52px; animation: bounce 1s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+  .overlay-title { font-size: 28px; font-weight: 900; color: #333; }
+  .overlay-sub   { font-size: 15px; font-weight: 700; color: #666; }
+
+  .hint { font-size: 11px; font-weight: 700; color: #c4aa88; text-align: center; }
+</style>
+</head>
+<body>
+<div class="bg-shapes">
+  <div class="shape"></div><div class="shape"></div><div class="shape"></div>
+</div>
+
+<div class="game-wrapper">
+  <div class="header">
+    <div class="title">Puzzle Pour</div>
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">🔄 이동</div>
+        <div class="stat-value" id="movesDisplay">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="diff-row">
+      <button class="diff-btn active" data-diff="easy"   onclick="init('easy')">쉬움</button>
+      <button class="diff-btn"        data-diff="medium" onclick="init('medium')">보통</button>
+      <button class="diff-btn"        data-diff="hard"   onclick="init('hard')">어려움</button>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="init()">새 게임</button>
+      <a href="../index.html" class="btn muted">🏠</a>
+    </div>
+  </div>
+
+  <div class="board-outer">
+    <div id="tubeContainer"></div>
+    <div class="overlay" id="overlay">
+      <div class="overlay-emoji">🎉</div>
+      <div class="overlay-title">클리어!</div>
+      <div class="overlay-sub" id="overlaySub"></div>
+      <button class="btn" onclick="init()" style="margin-top:8px">다음 퍼즐</button>
+    </div>
+  </div>
+
+  <div class="hint">튜브를 탭해서 색을 옮기세요 · 각 튜브를 한 색으로 채우면 클리어!</div>
+</div>
+
+<script src="puzzlepour.js"></script>
+<script>window.addEventListener('load', () => init('easy'));</script>
+</body>
+</html>

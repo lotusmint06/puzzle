@@ -317,7 +317,53 @@
   .streak-star.lit { animation: starPop 0.3s ease; }
   @keyframes starPop { 0%{transform:scale(1)} 50%{transform:scale(1.5)} 100%{transform:scale(1)} }
 
-  /* Theme tabs */
+  /* Settings */
+  .settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 50;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .settings-overlay.show { opacity: 1; pointer-events: all; }
+
+  .settings-panel {
+    background: var(--bg);
+    border-radius: 20px;
+    padding: 20px;
+    width: min(400px, calc(100vw - 32px));
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    transform: translateY(-12px);
+    transition: transform 0.2s;
+  }
+  .settings-overlay.show .settings-panel { transform: translateY(0); }
+
+  .settings-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: #b0996e;
+    letter-spacing: 0.5px;
+  }
+
+  .settings-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #b0996e;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Theme / grid tabs */
   .theme-row {
     display: flex;
     gap: 6px;
@@ -344,6 +390,7 @@
   }
   .grid-btn.active {
     background: #4d96ff;
+    color: white;
     box-shadow: 0 3px 0 #2a70d4;
   }
 
@@ -395,27 +442,7 @@
         <div class="score-value" id="bestDisplay">0</div>
       </div>
       <div class="score-box timer-box" id="timerDisplay">⏱ 2:00</div>
-      <a href="../index.html" class="score-box" style="background:#e8d8c0;box-shadow:0 4px 0 #d4c2a8;color:#8b6914;text-decoration:none;font-size:22px;display:flex;align-items:center;justify-content:center;min-width:unset;padding:8px 12px" title="메인으로">🏠</a>
     </div>
-  </div>
-
-  <div class="theme-row">
-    <button class="theme-btn active" data-theme="number" onclick="setTheme('number')">숫자</button>
-    <button class="theme-btn" data-theme="animal" onclick="setTheme('animal')">🐾 동물</button>
-    <button class="theme-btn" data-theme="building" onclick="setTheme('building')">🏙️ 건물</button>
-  </div>
-
-  <div class="theme-row">
-    <button class="theme-btn grid-btn" data-grid="3" onclick="setGrid(3)">3×3</button>
-    <button class="theme-btn grid-btn active" data-grid="4" onclick="setGrid(4)">4×4</button>
-    <button class="theme-btn grid-btn" data-grid="5" onclick="setGrid(5)">5×5</button>
-  </div>
-
-  <div class="theme-row">
-    <button class="theme-btn timer-btn active" data-timer="0" onclick="setTimer(0)">⏱ 끄기</button>
-    <button class="theme-btn timer-btn" data-timer="60" onclick="setTimer(60)">1분</button>
-    <button class="theme-btn timer-btn" data-timer="120" onclick="setTimer(120)">2분</button>
-    <button class="theme-btn timer-btn" data-timer="180" onclick="setTimer(180)">3분</button>
   </div>
 
   <div class="sub-row">
@@ -431,6 +458,7 @@
     </div>
     <div style="display:flex;gap:6px">
       <button class="btn undo" id="undoBtn" title="되돌리기">↩ 되돌리기</button>
+      <button class="btn" onclick="toggleSettings()" style="background:#e8d8c0;box-shadow:0 4px 0 #d4c2a8;color:#8b6914;font-size:20px;padding:10px 14px;">⚙️</button>
       <button class="btn" id="newBtn">새 게임</button>
     </div>
   </div>
@@ -455,6 +483,40 @@
 
   <div style="font-size:12px;font-weight:700;color:#c4aa88;text-align:center;letter-spacing:0.3px">
     ← → ↑ ↓ 키 또는 손가락으로 밀어보세요!
+  </div>
+</div>
+
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsOutside(event)">
+  <div class="settings-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div class="settings-title">⚙️ 설정</div>
+      <a href="../index.html" class="btn" style="background:#e8d8c0;box-shadow:0 4px 0 #d4c2a8;color:#8b6914;text-decoration:none;font-size:13px">🏠 메인으로</a>
+    </div>
+    <div>
+      <div class="settings-label">테마</div>
+      <div class="theme-row">
+        <button class="theme-btn active" data-theme="number" onclick="setTheme('number')">숫자</button>
+        <button class="theme-btn" data-theme="animal" onclick="setTheme('animal')">🐾 동물</button>
+        <button class="theme-btn" data-theme="building" onclick="setTheme('building')">🏙️ 건물</button>
+      </div>
+    </div>
+    <div>
+      <div class="settings-label">그리드 크기</div>
+      <div class="theme-row">
+        <button class="theme-btn grid-btn" data-grid="3" onclick="setGrid(3)">3×3</button>
+        <button class="theme-btn grid-btn active" data-grid="4" onclick="setGrid(4)">4×4</button>
+        <button class="theme-btn grid-btn" data-grid="5" onclick="setGrid(5)">5×5</button>
+      </div>
+    </div>
+    <div>
+      <div class="settings-label">타이머</div>
+      <div class="theme-row">
+        <button class="theme-btn timer-btn active" data-timer="0" onclick="setTimer(0)">무한모드</button>
+        <button class="theme-btn timer-btn" data-timer="60" onclick="setTimer(60)">1분</button>
+        <button class="theme-btn timer-btn" data-timer="120" onclick="setTimer(120)">2분</button>
+        <button class="theme-btn timer-btn" data-timer="180" onclick="setTimer(180)">3분</button>
+      </div>
+    </div>
   </div>
 </div>
 

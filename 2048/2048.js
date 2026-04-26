@@ -79,6 +79,7 @@ function init(fresh = true) {
 function setTimer(secs) {
   timerDuration = secs;
   localStorage.setItem('2048timer', secs);
+  document.getElementById('settingsOverlay').classList.remove('show');
   init(true);
 }
 
@@ -117,6 +118,7 @@ function updateTimerDisplay() {
 function setGrid(n) {
   GRID = n;
   localStorage.setItem('2048grid', n);
+  document.getElementById('settingsOverlay').classList.remove('show');
   init(true);
 }
 
@@ -265,9 +267,9 @@ function tileClass(v) {
 function tileFontSize(v) {
   const m = GRID === 3 ? 1.15 : GRID === 5 ? 0.75 : 1;
   if (v < 100)   return `clamp(${Math.round(28*m)}px,${(8*m).toFixed(1)}vw,${Math.round(44*m)}px)`;
-  if (v < 1000)  return `clamp(${Math.round(22*m)}px,${(6*m).toFixed(1)}vw,${Math.round(34*m)}px)`;
-  if (v < 10000) return `clamp(${Math.round(16*m)}px,${(4.5*m).toFixed(1)}vw,${Math.round(26*m)}px)`;
-  return `clamp(${Math.round(12*m)}px,${(3.5*m).toFixed(1)}vw,${Math.round(20*m)}px)`;
+  if (v < 1000)  return `clamp(${Math.round(22*m)}px,${(6*m).toFixed(1)}vw,${Math.round(36*m)}px)`;
+  if (v < 10000) return `clamp(${Math.round(20*m)}px,${(5.6*m).toFixed(1)}vw,${Math.round(31*m)}px)`;
+  return `clamp(${Math.round(16*m)}px,${(4.5*m).toFixed(1)}vw,${Math.round(26*m)}px)`;
 }
 
 function emojiSize() {
@@ -409,7 +411,10 @@ function spawnScorePopups(removedIds) {
   const rect    = wrapEl.getBoundingClientRect();
   const { gap, pad, cellW, cellH } = getMetrics();
 
+  const seen = new Set();
   for (const { absorbedBy, pts } of removedIds) {
+    if (seen.has(absorbedBy)) continue;
+    seen.add(absorbedBy);
     for (let r = 0; r < GRID; r++) {
       for (let c = 0; c < GRID; c++) {
         if (tileIdGrid[r][c] !== absorbedBy) continue;
@@ -420,6 +425,7 @@ function spawnScorePopups(removedIds) {
         el.style.top   = (rect.top  + pad + r * (cellH + gap) + cellH / 2) + 'px';
         document.body.appendChild(el);
         setTimeout(() => el.remove(), 900);
+        break;
       }
     }
   }
@@ -463,6 +469,7 @@ function spawnStarBursts() {
 function setTheme(name) {
   currentTheme = name;
   localStorage.setItem('2048theme', name);
+  document.getElementById('settingsOverlay').classList.remove('show');
   document.querySelectorAll('.theme-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.theme === name);
   });
@@ -472,6 +479,14 @@ function setTheme(name) {
       const v  = board[r][c];
       if (id && v && tileEls[id]) setTileContent(tileEls[id], v);
     }
+}
+
+// --- Settings ---
+function toggleSettings() {
+  document.getElementById('settingsOverlay').classList.toggle('show');
+}
+function closeSettingsOutside(e) {
+  if (e.target === document.getElementById('settingsOverlay')) toggleSettings();
 }
 
 // --- Input ---

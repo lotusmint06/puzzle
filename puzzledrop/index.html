@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Drop 🟥</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #fff9f0; --board-bg: #f0e6d3; --cell-bg: #e8d8c0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 12px 16px 20px;
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: #ff6b6b; top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: #4d96ff; top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: #ffd93d; bottom: -30px; left: 30%; animation-delay: 4s; }
+  @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+
+  .game-wrapper {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    width: 100%; max-width: 440px;
+  }
+
+  .header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+  .title {
+    font-size: clamp(22px, 6vw, 34px); font-weight: 900;
+    letter-spacing: -1px; line-height: 1;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #4d96ff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .scores { display: flex; gap: 8px; }
+  .score-box {
+    background: #ff6b6b; border-radius: 12px; padding: 6px 14px;
+    text-align: center; color: white; box-shadow: 0 3px 0 #c43c3c; min-width: 68px;
+  }
+  .score-box.best { background: #ffd93d; box-shadow: 0 3px 0 #d4aa00; color: #7a5c00; }
+  .score-label { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; white-space: nowrap; }
+  .score-value { font-size: 20px; font-weight: 900; line-height: 1.2; }
+
+  .controls { display: flex; align-items: center; justify-content: flex-end; width: 100%; gap: 6px; }
+  .btn {
+    background: #4d96ff; color: white; border: none; border-radius: 10px;
+    padding: 8px 16px; font-family: 'Nunito', sans-serif; font-size: 13px;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #2a70d4;
+    white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+
+  /* Board */
+  .board-outer {
+    position: relative; width: 100%;
+    background: var(--board-bg); border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 6px 0 #d4c2a8, 0 10px 30px rgba(0,0,0,0.08);
+  }
+
+  #pdGrid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 3px;
+    width: 100%;
+    user-select: none;
+  }
+
+  .pd-cell {
+    aspect-ratio: 1;
+    background: var(--cell-bg);
+    border-radius: 5px;
+    transition: background 0.08s, box-shadow 0.08s;
+  }
+  .pd-cell.preview-ok  { background: rgba(107,203,119,0.5); box-shadow: 0 3px 0 rgba(58,154,69,0.4); }
+  .pd-cell.preview-bad { background: rgba(255,107,107,0.45); }
+
+  @keyframes cellClear {
+    0%   { transform: scale(1);    filter: brightness(1); }
+    30%  { transform: scale(1.2);  filter: brightness(2.2) saturate(1.5); }
+    70%  { transform: scale(1.05); filter: brightness(1.6); }
+    100% { transform: scale(1);    filter: brightness(1) opacity(0); }
+  }
+  .pd-cell.clearing { animation: cellClear 0.32s ease-out forwards; z-index: 2; position: relative; }
+
+  .clear-popup {
+    position: fixed; font-family: 'Nunito', sans-serif;
+    font-size: clamp(18px, 5vw, 26px); font-weight: 900;
+    color: #ffd93d; text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    pointer-events: none; z-index: 999;
+    transform: translate(-50%, -50%);
+    animation: scoreFloat 0.85s ease-out forwards;
+  }
+  .combo-popup {
+    position: fixed; font-family: 'Nunito', sans-serif;
+    font-size: clamp(24px, 7vw, 36px); font-weight: 900;
+    color: white; white-space: nowrap;
+    text-shadow: 0 2px 14px rgba(255,107,107,0.9), 0 0 40px rgba(255,217,61,0.7);
+    pointer-events: none; z-index: 999;
+    transform: translate(-50%, -50%);
+    animation: comboPop 0.95s ease-out forwards;
+  }
+  @keyframes scoreFloat {
+    0%   { opacity: 1; transform: translate(-50%,-50%) scale(0.7); }
+    25%  { opacity: 1; transform: translate(-50%,-80%) scale(1.25); }
+    100% { opacity: 0; transform: translate(-50%,-170%) scale(0.9); }
+  }
+  @keyframes comboPop {
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.3) rotate(-8deg); }
+    25%  { opacity: 1; transform: translate(-50%,-50%) scale(1.35) rotate(2deg); }
+    55%  { opacity: 1; transform: translate(-50%,-60%) scale(1.1) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%,-90%) scale(0.95); }
+  }
+
+  /* Overlay */
+  .overlay {
+    position: absolute; inset: 0; border-radius: 16px;
+    background: rgba(240,220,200,0.93);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .overlay-emoji { font-size: 52px; animation: bounce 1s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+  .overlay-title { font-size: 28px; font-weight: 900; color: #333; }
+  .overlay-sub   { font-size: 15px; font-weight: 700; color: #666; }
+
+  /* Piece panel */
+  .piece-panel {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    background: var(--board-bg);
+    border-radius: 16px;
+    padding: 14px 8px;
+    box-shadow: 0 4px 0 #d4c2a8;
+    min-height: 110px;
+  }
+
+  .piece-slot {
+    display: flex; align-items: center; justify-content: center;
+    width: 90px; height: 90px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .piece-slot:active { cursor: grabbing; }
+
+  .hint { font-size: 11px; font-weight: 700; color: #c4aa88; text-align: center; }
+</style>
+</head>
+<body>
+<div class="bg-shapes">
+  <div class="shape"></div><div class="shape"></div><div class="shape"></div>
+</div>
+
+<div class="game-wrapper">
+  <div class="header">
+    <div class="title">Block Blast</div>
+    <div class="scores">
+      <div class="score-box">
+        <div class="score-label">점수</div>
+        <div class="score-value" id="scoreDisplay">0</div>
+      </div>
+      <div class="score-box best">
+        <div class="score-label">최고</div>
+        <div class="score-value" id="bestDisplay">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="newBtn">새 게임</button>
+    <a href="../index.html" class="btn muted">🏠</a>
+  </div>
+
+  <div class="board-outer">
+    <div id="pdGrid"></div>
+    <div class="overlay" id="overlay">
+      <div class="overlay-emoji">😵</div>
+      <div class="overlay-title">게임 오버!</div>
+      <div class="overlay-sub" id="finalScore"></div>
+      <button class="btn" id="retryBtn" style="margin-top:8px">다시 하기</button>
+    </div>
+  </div>
+
+  <div class="piece-panel">
+    <div class="piece-slot" id="piece-0"></div>
+    <div class="piece-slot" id="piece-1"></div>
+    <div class="piece-slot" id="piece-2"></div>
+  </div>
+
+  <div class="hint">블록을 드래그해서 보드에 놓으세요 · 가로/세로를 채우면 클리어!</div>
+</div>
+
+<script src="puzzledrop.js"></script>
+</body>
+</html>

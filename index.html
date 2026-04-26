@@ -103,19 +103,19 @@
   /* Game grid */
   .game-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     width: 100%;
   }
 
   /* Game card */
   .game-card {
     background: var(--card-bg);
-    border-radius: 24px;
-    padding: 28px 24px 22px;
+    border-radius: 20px;
+    padding: 20px 16px 18px;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     box-shadow: 0 6px 0 #e8d5b0, 0 10px 30px rgba(0,0,0,0.07);
     text-decoration: none;
@@ -136,9 +136,11 @@
   }
 
   .game-card.c-2048::before  { background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77); }
-  .game-card.c-sudoku::before { background: linear-gradient(90deg, #a0aec0, #cbd5e0); }
-  .game-card.c-mine::before   { background: linear-gradient(90deg, #a0aec0, #cbd5e0); }
-  .game-card.c-snake::before  { background: linear-gradient(90deg, #a0aec0, #cbd5e0); }
+  .game-card.c-sudoku::before { background: linear-gradient(90deg, #ffd93d, #4d96ff); }
+  .game-card.c-mine::before   { background: linear-gradient(90deg, #ff6b6b, #ffd93d); }
+  .game-card.c-block::before  { background: linear-gradient(90deg, #ff6b6b, #4d96ff); }
+  .game-card.c-pour::before   { background: linear-gradient(90deg, #ff6b6b, #ffd93d, #4d96ff); }
+  .game-card.c-snake::before  { background: linear-gradient(90deg, #6bcb77, #4d96ff); }
 
   .game-card:not(.coming-soon):hover {
     transform: translateY(-4px);
@@ -155,18 +157,120 @@
     filter: grayscale(0.3);
   }
 
-  .card-icon {
-    font-size: 48px;
-    line-height: 1;
+  /* ── 공통 미니 아이콘 ── */
+  .mini-icon {
+    width: 64px; height: 64px;
+    border-radius: 10px;
+    box-shadow: 0 3px 0 #d4c2a8;
+    flex-shrink: 0;
+    overflow: hidden;
   }
 
-  /* 2048 미니 타일 그리드 아이콘 */
+  /* ── Snake ── */
+  .mini-snake {
+    background: #1e2240;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+  }
+  .sn   { border-radius: 2px; background: transparent; }
+  .sn-h { background: #4d96ff; border-radius: 4px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3); }
+  .sn-b { background: #6bcb77; box-shadow: 0 1px 0 #3a9a45; }
+  .sn-t { background: #54a860; border-radius: 2px; } /* tail */
+  .sn-f { background: #ff6b6b; border-radius: 50%; box-shadow: 0 1px 0 #c43c3c; }
+
+  /* ── Puzzle Pour ── */
+  .mini-pour {
+    background: #f0e6d3;
+    padding: 7px 6px 5px;
+    display: flex;
+    gap: 5px;
+    align-items: flex-end;
+  }
+  .mp-tube {
+    flex: 1;
+    border: 2px solid #c8b898;
+    border-top: none;
+    border-radius: 0 0 7px 7px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 50px;
+  }
+  .mp-seg { flex: 1; }
+  .mp-e   { background: transparent; }
+  .mp-r   { background: #ff6b6b; }
+  .mp-b   { background: #4d96ff; }
+  .mp-y   { background: #ffd93d; }
+  .mp-g   { background: #6bcb77; }
+  .mp-p   { background: #a78bfa; }
+
+  /* ── Sudoku ── */
+  .mini-sudoku {
+    background: #fff4e6;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 2px solid #c8b898;
+  }
+  .sdk {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900;
+    border: 0.5px solid #e8d8c0;
+    aspect-ratio: 1;
+  }
+  .sdk.box-r { border-right: 1.5px solid #c8b898; }
+  .sdk.box-b { border-bottom: 1.5px solid #c8b898; }
+  .sdk.gv  { color: #5a3e1b; }
+  .sdk.fil { color: #4d96ff; }
+  .sdk.em  { color: transparent; }
+
+  /* ── Puzzle Drop ── */
+  .mini-drop {
+    background: #f0e6d3;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+  }
+  .pd    { border-radius: 2px; }
+  .pd-e  { background: #e8d8c0; }
+  .pd-r  { background: #ff6b6b; box-shadow: 0 2px 0 #c43c3c; }
+  .pd-b  { background: #4d96ff; box-shadow: 0 2px 0 #2060c0; }
+  .pd-y  { background: #ffd93d; box-shadow: 0 2px 0 #c4a000; }
+  .pd-g  { background: #6bcb77; box-shadow: 0 2px 0 #3a9a45; }
+  .pd-p  { background: #a78bfa; box-shadow: 0 2px 0 #7c5cda; }
+
+  /* ── Minesweeper ── */
+  .mini-ms {
+    background: #f0e6d3;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+  .mc {
+    border-radius: 3px; aspect-ratio: 1;
+    background: #e8d8c0;
+    box-shadow: 0 2px 0 #d0c0a8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; font-weight: 900;
+  }
+  .mc.rev  { background: #f5ede0; box-shadow: none; }
+  .mc.n1   { color: #4d96ff; }
+  .mc.n2   { color: #6bcb77; }
+  .mc.n3   { color: #ff6b6b; }
+  .mc.flag { background: #fff4e6; font-size: 9px; }
+  .mc.mine { background: #ff6b6b; font-size: 9px; }
+
+  /* ── 2048 미니 타일 그리드 아이콘 ── */
   .mini-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 4px;
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     background: #e8d5b0;
     border-radius: 10px;
     padding: 5px;
@@ -186,16 +290,18 @@
   .mt-128  { background: #ffd93d; color: #7a5c00; box-shadow: 0 2px 0 #c4a000; }
   .mt-2048 { background: linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77); box-shadow: 0 2px 0 #888; font-size: 8px; }
 
-  .card-body { width: 100%; }
+  .card-body { width: 100%; text-align: center; }
 
   .card-title {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 900;
     color: var(--text);
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
   }
 
   .badge-soon {
@@ -222,7 +328,7 @@
   }
 
   .play-btn {
-    margin-top: 14px;
+    margin-top: 0;
     background: #ff6b6b;
     color: white;
     border: none;
@@ -303,49 +409,89 @@
       </div>
       <div class="card-body">
         <div class="card-title">2048</div>
-        <div class="card-desc">숫자 타일을 합쳐<br>2048을 만들어라</div>
       </div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <div class="game-card c-sudoku coming-soon">
-      <div class="card-icon">🔢</div>
-      <div class="card-body">
-        <div class="card-title">
-          스도쿠
-          <span class="badge-lock">🔒</span>
-          <span class="badge-soon">Soon</span>
-        </div>
-        <div class="card-desc">1~9를 빠짐없이<br>채워 넣어라</div>
+    <a class="game-card c-snake" href="./snake/index.html">
+      <div class="mini-icon mini-snake">
+        <div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div>
+        <div class="sn"></div><div class="sn-h"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div>
+        <div class="sn"></div><div class="sn-b"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div>
+        <div class="sn"></div><div class="sn-b"></div><div class="sn-b"></div><div class="sn-t"></div><div class="sn"></div>
+        <div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn-f"></div>
       </div>
-      <button class="play-btn">준비 중</button>
-    </div>
+      <div class="card-body">
+        <div class="card-title">스네이크</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
 
-    <div class="game-card c-mine coming-soon">
-      <div class="card-icon">💣</div>
-      <div class="card-body">
-        <div class="card-title">
-          지뢰찾기
-          <span class="badge-lock">🔒</span>
-          <span class="badge-soon">Soon</span>
+    <a class="game-card c-pour" href="./puzzlepour/index.html">
+      <div class="mini-icon mini-pour">
+        <div class="mp-tube">
+          <div class="mp-seg mp-e"></div>
+          <div class="mp-seg mp-y"></div>
+          <div class="mp-seg mp-r"></div>
+          <div class="mp-seg mp-r"></div>
         </div>
-        <div class="card-desc">지뢰를 피해<br>모든 칸을 열어라</div>
+        <div class="mp-tube">
+          <div class="mp-seg mp-b"></div>
+          <div class="mp-seg mp-b"></div>
+          <div class="mp-seg mp-g"></div>
+          <div class="mp-seg mp-g"></div>
+        </div>
+        <div class="mp-tube">
+          <div class="mp-seg mp-e"></div>
+          <div class="mp-seg mp-e"></div>
+          <div class="mp-seg mp-p"></div>
+          <div class="mp-seg mp-y"></div>
+        </div>
       </div>
-      <button class="play-btn">준비 중</button>
-    </div>
+      <div class="card-body">
+        <div class="card-title">Puzzle Pour</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
 
-    <div class="game-card c-snake coming-soon">
-      <div class="card-icon">🐍</div>
-      <div class="card-body">
-        <div class="card-title">
-          스네이크
-          <span class="badge-lock">🔒</span>
-          <span class="badge-soon">Soon</span>
-        </div>
-        <div class="card-desc">먹이를 먹으며<br>최대한 길게 자라라</div>
+    <a class="game-card c-sudoku" href="./sudoku/index.html">
+      <div class="mini-icon mini-sudoku">
+        <div class="sdk gv box-r box-b">1</div><div class="sdk em box-b">·</div><div class="sdk fil box-b">3</div>
+        <div class="sdk em box-r">·</div><div class="sdk gv">5</div><div class="sdk fil">6</div>
+        <div class="sdk fil box-r">7</div><div class="sdk gv">8</div><div class="sdk em">·</div>
       </div>
-      <button class="play-btn">준비 중</button>
-    </div>
+      <div class="card-body">
+        <div class="card-title">스도쿠</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
+
+    <a class="game-card c-block" href="./puzzledrop/index.html">
+      <div class="mini-icon mini-drop">
+        <div class="pd pd-e"></div><div class="pd pd-e"></div><div class="pd pd-e"></div><div class="pd pd-e"></div><div class="pd pd-e"></div>
+        <div class="pd pd-e"></div><div class="pd pd-b"></div><div class="pd pd-b"></div><div class="pd pd-e"></div><div class="pd pd-e"></div>
+        <div class="pd pd-e"></div><div class="pd pd-b"></div><div class="pd pd-r"></div><div class="pd pd-r"></div><div class="pd pd-e"></div>
+        <div class="pd pd-g"></div><div class="pd pd-g"></div><div class="pd pd-r"></div><div class="pd pd-r"></div><div class="pd pd-y"></div>
+        <div class="pd pd-g"></div><div class="pd pd-p"></div><div class="pd pd-p"></div><div class="pd pd-y"></div><div class="pd pd-y"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">Puzzle Drop</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
+
+    <a class="game-card c-mine" href="./minesweeper/index.html">
+      <div class="mini-icon mini-ms">
+        <div class="mc"></div><div class="mc"></div><div class="mc rev n1">1</div><div class="mc rev n2">2</div>
+        <div class="mc flag">🚩</div><div class="mc rev n1">1</div><div class="mc rev">  </div><div class="mc rev n1">1</div>
+        <div class="mc"></div><div class="mc rev n2">2</div><div class="mc rev n1">1</div><div class="mc rev">  </div>
+        <div class="mc"></div><div class="mc"></div><div class="mc rev n3">3</div><div class="mc mine">💣</div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">지뢰찾기</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
 
   </div>
 

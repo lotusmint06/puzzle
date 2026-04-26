@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>지뢰찾기 💣</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #fff9f0; --board-bg: #f0e6d3; --cell-bg: #e8d8c0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 16px 16px;
+    overflow-x: hidden;
+  }
+
+  .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: #ff6b6b; top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: #ffd93d; top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: #4d96ff; bottom: -30px; left: 30%; animation-delay: 4s; }
+  @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+
+  .game-wrapper {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    width: 100%; max-width: 480px;
+  }
+
+  .header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+  .title {
+    font-size: clamp(28px, 8vw, 42px); font-weight: 900;
+    letter-spacing: -1px; line-height: 1;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .stats { display: flex; gap: 8px; }
+  .stat-box {
+    background: #ff6b6b; border-radius: 12px; padding: 6px 12px;
+    text-align: center; color: white; box-shadow: 0 3px 0 #c43c3c; min-width: 60px;
+  }
+  .stat-box.timer { background: #4d96ff; box-shadow: 0 3px 0 #2a70d4; }
+  .stat-label { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; }
+  .stat-value { font-size: 18px; font-weight: 900; line-height: 1.2; }
+
+  .controls { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
+
+  .level-row { display: flex; gap: 5px; }
+  .level-btn {
+    background: #e8d8c0; color: #8b6914; border: none; border-radius: 8px;
+    padding: 6px 12px; font-family: 'Nunito', sans-serif; font-size: 12px;
+    font-weight: 800; cursor: pointer; transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .level-btn.active { background: #ff6b6b; color: white; box-shadow: 0 3px 0 #c43c3c; }
+
+  .btn {
+    background: #4d96ff; color: white; border: none; border-radius: 10px;
+    padding: 8px 16px; font-family: 'Nunito', sans-serif; font-size: 13px;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #2a70d4;
+    transition: transform 0.1s; white-space: nowrap; text-decoration: none;
+    display: inline-flex; align-items: center;
+  }
+  .btn:active { transform: translateY(2px); }
+  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+
+  /* Board */
+  .board-wrap-outer {
+    position: relative; width: 100%;
+    background: var(--board-bg); border-radius: 16px;
+    padding: clamp(6px, 2vw, 12px);
+    box-shadow: 0 6px 0 #d4c2a8, 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+
+  .board-wrap {
+    display: grid; gap: clamp(2px, 0.8vw, 5px);
+    width: 100%;
+  }
+
+  .cell {
+    aspect-ratio: 1;
+    background: var(--cell-bg);
+    border-radius: clamp(3px, 1vw, 6px);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(10px, 3vw, 16px);
+    font-weight: 900; cursor: pointer;
+    box-shadow: 0 2px 0 #d0c0a8;
+    transition: transform 0.08s, background 0.1s;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .cell:active { transform: scale(0.92); }
+  .cell.revealed {
+    background: #f5ede0; box-shadow: none; cursor: default;
+    font-size: clamp(9px, 2.8vw, 15px);
+  }
+  .cell.revealed.mine { background: #ff6b6b; font-size: clamp(10px, 3vw, 16px); }
+  .cell.flagged { background: #fff4e6; }
+
+  /* Overlay */
+  .overlay {
+    position: absolute; inset: 0; border-radius: 16px;
+    background: rgba(240,220,200,0.93);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .overlay-emoji { font-size: 52px; animation: bounce 1s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+  .overlay-title { font-size: 28px; font-weight: 900; color: #333; }
+  .overlay-sub   { font-size: 14px; font-weight: 700; color: #666; }
+
+  .mode-btn {
+    flex: 1; padding: 10px; border: none; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800;
+    cursor: pointer; background: #e8d8c0; color: #8b6914;
+    box-shadow: 0 3px 0 #d4c2a8; transition: background 0.15s;
+  }
+  .mode-btn.active { background: #ff6b6b; color: white; box-shadow: 0 3px 0 #c43c3c; }
+  #modeFlag.active { background: #6bcb77; box-shadow: 0 3px 0 #3a9a45; }
+
+  .hint { font-size: 11px; font-weight: 700; color: #c4aa88; text-align: center; }
+</style>
+</head>
+<body>
+<div class="bg-shapes">
+  <div class="shape"></div><div class="shape"></div><div class="shape"></div>
+</div>
+
+<div class="game-wrapper">
+  <div class="header">
+    <div class="title">지뢰찾기</div>
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">💣 남은</div>
+        <div class="stat-value" id="mineCounter">10</div>
+      </div>
+      <div class="stat-box timer">
+        <div class="stat-label">⏱ 시간</div>
+        <div class="stat-value" id="timerDisplay">0:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="level-row">
+      <button class="level-btn active" data-level="easy"   onclick="init('easy')">쉬움</button>
+      <button class="level-btn"        data-level="medium" onclick="init('medium')">보통</button>
+      <button class="level-btn"        data-level="hard"   onclick="init('hard')">어려움</button>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" id="newBtn">새 게임</button>
+      <a href="../index.html" class="btn muted">🏠</a>
+    </div>
+  </div>
+
+  <div style="width:100%;display:flex;gap:8px">
+    <button class="mode-btn active" id="modeOpen" onclick="setMode('open')">👆 열기</button>
+    <button class="mode-btn"        id="modeFlag" onclick="setMode('flag')">🚩 깃발</button>
+  </div>
+
+  <div class="board-wrap-outer">
+    <div class="board-wrap" id="boardWrap"></div>
+    <div class="overlay" id="overlay">
+      <div class="overlay-emoji" id="overlayEmoji">💥</div>
+      <div class="overlay-title" id="overlayTitle">펑!</div>
+      <div class="overlay-sub"   id="overlaySub"></div>
+      <button class="btn" id="retryBtn" style="margin-top:8px">다시 하기</button>
+    </div>
+  </div>
+
+  <div class="hint">PC: 우클릭으로 깃발 · 모바일: 🚩 깃발 모드 전환</div>
+</div>
+
+<script src="minesweeper.js"></script>
+</body>
+</html>
