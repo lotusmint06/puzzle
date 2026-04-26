@@ -7,6 +7,10 @@ let tileIdGrid;
 let tileEls = {};
 let nextId = 1;
 
+let timerDuration = parseInt(localStorage.getItem('2048timer') || '0'); // 0=off, seconds
+let timeLeft = 0;
+let timerInterval = null;
+
 const THEMES = {
   animal: {
     2:'🐣', 4:'🐥', 8:'🐔', 16:'🦆', 32:'🦢', 64:'🦩',
@@ -42,6 +46,8 @@ function init(fresh = true) {
     prevScore = 0;
     initCells();
     addTile(); addTile();
+    stopTimer();
+    if (timerDuration > 0) startTimer();
   }
 
   currentTheme = localStorage.getItem('2048theme') || 'number';
@@ -52,12 +58,55 @@ function init(fresh = true) {
     btn.classList.toggle('active', parseInt(btn.dataset.grid) === GRID);
   });
 
+  document.querySelectorAll('.timer-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.timer) === timerDuration);
+  });
+
   best = parseInt(localStorage.getItem(bestKey()) || '0');
   updateScoreUI();
   updateStreakUI();
   updateUndoBtn();
+  updateTimerDisplay();
   hideOverlays();
   renderBoard();
+}
+
+function setTimer(secs) {
+  timerDuration = secs;
+  localStorage.setItem('2048timer', secs);
+  init(true);
+}
+
+function startTimer() {
+  timeLeft = timerDuration;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) {
+      stopTimer();
+      setTimeout(showLose, 100);
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timerDisplay');
+  if (!el) return;
+  if (timerDuration === 0) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'flex';
+  const m = Math.floor(Math.max(timeLeft, 0) / 60);
+  const s = Math.max(timeLeft, 0) % 60;
+  el.textContent = `⏱ ${m}:${s.toString().padStart(2, '0')}`;
+  el.classList.toggle('urgent', timeLeft <= 10 && timerDuration > 0);
 }
 
 function setGrid(n) {
@@ -180,8 +229,10 @@ function move(dir) {
   const maxVal = Math.max(...board.flat());
   const target = WIN_TARGET[GRID] ?? 2048;
   if (maxVal >= target && !continued) {
+    stopTimer();
     setTimeout(() => { showWin(target); launchConfetti(); }, 350);
   } else if (isGameOver()) {
+    stopTimer();
     setTimeout(showLose, 350);
   }
 }

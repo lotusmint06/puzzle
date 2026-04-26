@@ -98,6 +98,23 @@
     min-width: 72px;
   }
   .score-box.best { background: #ffd93d; box-shadow: 0 4px 0 #d4aa00; color: #7a5c00; }
+  .score-box.timer-box {
+    background: #6bcb77;
+    box-shadow: 0 4px 0 #3a9a45;
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    min-width: 80px;
+    transition: background 0.3s;
+  }
+  .score-box.timer-box.urgent { background: #ff6b6b; box-shadow: 0 4px 0 #c43c3c; animation: pulse 0.6s ease infinite; }
+  @keyframes pulse { 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.06); } }
+
+  .timer-btn.active { background: #6bcb77; color: white; box-shadow: 0 3px 0 #3a9a45; }
 
   .score-label {
     font-size: 10px;
@@ -376,6 +393,7 @@
         <div class="score-label">최고</div>
         <div class="score-value" id="bestDisplay">0</div>
       </div>
+      <div class="score-box timer-box" id="timerDisplay">⏱ 2:00</div>
     </div>
   </div>
 
@@ -389,6 +407,13 @@
     <button class="theme-btn grid-btn" data-grid="3" onclick="setGrid(3)">3×3</button>
     <button class="theme-btn grid-btn active" data-grid="4" onclick="setGrid(4)">4×4</button>
     <button class="theme-btn grid-btn" data-grid="5" onclick="setGrid(5)">5×5</button>
+  </div>
+
+  <div class="theme-row">
+    <button class="theme-btn timer-btn active" data-timer="0" onclick="setTimer(0)">⏱ 끄기</button>
+    <button class="theme-btn timer-btn" data-timer="60" onclick="setTimer(60)">1분</button>
+    <button class="theme-btn timer-btn" data-timer="120" onclick="setTimer(120)">2분</button>
+    <button class="theme-btn timer-btn" data-timer="180" onclick="setTimer(180)">3분</button>
   </div>
 
   <div class="sub-row">
