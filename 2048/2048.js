@@ -10,6 +10,7 @@ let nextId = 1;
 let timerDuration = parseInt(localStorage.getItem('2048timer') || '0'); // 0=off, seconds
 let timeLeft = 0;
 let timerInterval = null;
+let timerStarted = false;
 
 const THEMES = {
   animal: {
@@ -47,7 +48,11 @@ function init(fresh = true) {
     initCells();
     addTile(); addTile();
     stopTimer();
-    if (timerDuration > 0) startTimer();
+    timerStarted = false;
+    if (timerDuration > 0) {
+      timeLeft = timerDuration;
+      updateTimerDisplay();
+    }
   }
 
   currentTheme = localStorage.getItem('2048theme') || 'number';
@@ -216,11 +221,15 @@ function move(dir) {
 
   if (!moved) { prevBoard = null; return; }
 
+  if (timerDuration > 0 && !timerStarted) {
+    timerStarted = true;
+    startTimer();
+  }
+
   mergeStreak = totalMerged > 0 ? Math.min(mergeStreak + totalMerged, 5) : 0;
   updateScoreUI();
   updateStreakUI();
   updateUndoBtn();
-  if (totalMerged > 0) spawnStarBursts();
 
   const newTileInfo = addTile();
   renderBoard(newTileInfo, allRemovedIds);
