@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사목 🔴</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #fff9f0; --board-bg: #f0e6d3; --cell-bg: #e8d8c0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-start;
+    padding: 12px 16px 32px;
+    touch-action: none;
+  }
+
+  .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: #ff6b6b; top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: #ffd93d; top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: #4d96ff; bottom: -30px; left: 30%; animation-delay: 4s; }
+  @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+
+  .game-wrapper {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    width: 100%; max-width: 440px;
+  }
+
+  .header { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+
+  .title {
+    font-size: clamp(22px, 6vw, 32px); font-weight: 900;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .controls { display: flex; gap: 6px; align-items: center; }
+  .btn {
+    background: #4d96ff; color: white; border: none; border-radius: 10px;
+    padding: 8px 16px; font-family: 'Nunito', sans-serif; font-size: 13px;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #2a70d4;
+    white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+  }
+  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+
+  /* Status */
+  .status-bar {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; background: var(--board-bg); border-radius: 14px;
+    padding: 10px 16px; box-shadow: 0 4px 0 #d4c2a8;
+  }
+  .status-dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #ff6b6b; box-shadow: 0 2px 0 #c43c3c;
+    transition: background 0.2s;
+  }
+  .status-dot.ai { background: #ffd93d; box-shadow: 0 2px 0 #c4a000; }
+  #statusMsg { font-size: 15px; font-weight: 800; color: #5a3e1b; }
+
+  /* Legend */
+  .legend {
+    display: flex; gap: 16px; font-size: 12px; font-weight: 800; color: #8b6914;
+    align-items: center;
+  }
+  .legend-dot {
+    width: 14px; height: 14px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-right: 4px;
+  }
+
+  /* Board */
+  .board-outer {
+    position: relative; width: 100%;
+    background: #d4a84b;
+    border-radius: 16px;
+    padding: 10px;
+    box-shadow: 0 6px 0 #b08030, 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  #cfBoard {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    width: 100%;
+    user-select: none;
+  }
+
+  .cf-cell {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.18);
+    cursor: pointer;
+    transition: background 0.12s, transform 0.12s;
+    position: relative;
+  }
+
+  .cf-cell:not(.p-human):not(.p-ai):not(.win-cell):hover { transform: scale(1.05); }
+
+  .cf-cell.p-human {
+    background: #ff6b6b;
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.2), 0 2px 0 #c43c3c;
+    cursor: default;
+  }
+  .cf-cell.p-ai {
+    background: #ffd93d;
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.15), 0 2px 0 #c4a000;
+    cursor: default;
+  }
+  .cf-cell.p-hover {
+    background: rgba(255,107,107,0.35);
+  }
+  .cf-cell.win-cell {
+    animation: winPulse 0.5s ease-in-out infinite alternate !important;
+  }
+
+  /* 낙하 애니메이션 — 새로 놓인 말만 */
+  .cf-cell.just-placed {
+    animation: dropFall 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes dropFall {
+    0%   { transform: translateY(-260px) scale(0.85); opacity: 0.6; }
+    70%  { transform: translateY(6px)   scale(1.05); opacity: 1; }
+    85%  { transform: translateY(-3px)  scale(0.98); }
+    100% { transform: translateY(0)     scale(1); }
+  }
+
+  /* 최근 말 인디케이터 — 흰 점 */
+  .cf-cell.recent-0::after,
+  .cf-cell.recent-1::after,
+  .cf-cell.recent-2::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .cf-cell.recent-0::after { width: 30%; height: 30%; background: rgba(255,255,255,1); }
+  .cf-cell.recent-1::after { width: 22%; height: 22%; background: rgba(255,255,255,0.7); }
+  .cf-cell.recent-2::after { width: 15%; height: 15%; background: rgba(255,255,255,0.45); }
+
+  .cf-cell { position: relative; }
+
+  @keyframes winPulse {
+    from { transform: scale(1);    filter: brightness(1); }
+    to   { transform: scale(1.12); filter: brightness(1.4); }
+  }
+
+  /* Overlay */
+  .overlay {
+    position: absolute; inset: 0; border-radius: 16px;
+    background: rgba(212,168,75,0.93);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; z-index: 20; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+  .overlay-emoji { font-size: 52px; animation: bounce 1s ease-in-out infinite; }
+  @keyframes bounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+  .overlay-title { font-size: 28px; font-weight: 900; color: #3a2000; }
+  .overlay-msg   { font-size: 15px; font-weight: 700; color: #7a5000; }
+
+  .diff-row { display: flex; gap: 6px; width: 100%; }
+  .diff-btn {
+    flex: 1; padding: 8px; border: none; border-radius: 10px;
+    font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800;
+    cursor: pointer; background: #e8d8c0; color: #8b6914;
+    box-shadow: 0 3px 0 #d4c2a8; transition: 0.15s;
+  }
+  .diff-btn.active { background: #ff6b6b; color: white; box-shadow: 0 3px 0 #c43c3c; }
+
+  .hint { font-size: 11px; font-weight: 700; color: #c4aa88; text-align: center; }
+</style>
+</head>
+<body>
+<div class="bg-shapes">
+  <div class="shape"></div><div class="shape"></div><div class="shape"></div>
+</div>
+
+<div class="game-wrapper">
+  <div class="header">
+    <div class="title">사목 (Connect 4)</div>
+    <div class="controls">
+      <button class="btn" id="newBtn">새 게임</button>
+      <a href="../index.html" class="btn muted">🏠</a>
+    </div>
+  </div>
+
+  <div class="diff-row">
+    <button class="diff-btn" data-d="easy">쉬움</button>
+    <button class="diff-btn active" data-d="medium">보통</button>
+    <button class="diff-btn" data-d="hard">어려움</button>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusMsg">당신의 차례입니다</span>
+  </div>
+
+  <div class="legend">
+    <span><span class="legend-dot" style="background:#ff6b6b;box-shadow:0 2px 0 #c43c3c;"></span>나 (빨강)</span>
+    <span><span class="legend-dot" style="background:#ffd93d;box-shadow:0 2px 0 #c4a000;"></span>AI (노랑)</span>
+  </div>
+
+  <div class="board-outer">
+    <div id="cfBoard"></div>
+    <div class="overlay" id="overlay">
+      <div class="overlay-emoji" id="overlayEmoji">🎉</div>
+      <div class="overlay-title" id="overlayTitle">이겼어요!</div>
+      <div class="overlay-msg" id="overlayMsg"></div>
+      <button class="btn" id="retryBtn" style="margin-top:8px">다시 하기</button>
+    </div>
+  </div>
+
+  <div class="hint">열을 클릭해서 돌을 놓으세요 · 가로/세로/대각선 4개 연속으로 승리!</div>
+</div>
+
+<script src="connectfour.js"></script>
+</body>
+</html>
