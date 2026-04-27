@@ -344,33 +344,29 @@ function endDrag(clientX, clientY) {
   }
 }
 
-// --- Events ---
+// --- Events (Pointer Events API — works on iOS Safari, desktop, Android) ---
 function setupPieceEvents(slot, idx) {
-  slot.addEventListener('mousedown', e => {
+  slot.addEventListener('pointerdown', e => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return;
     e.preventDefault();
+    // release capture so document-level pointermove fires globally
+    if (slot.hasPointerCapture(e.pointerId)) slot.releasePointerCapture(e.pointerId);
     startDrag(idx, e.clientX, e.clientY);
   });
-  slot.addEventListener('touchstart', e => {
-    e.preventDefault();
-    const t = e.touches[0];
-    startDrag(idx, t.clientX, t.clientY);
-  }, { passive: false });
 }
 
-document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-document.addEventListener('mouseup',   e => endDrag(e.clientX, e.clientY));
-document.addEventListener('touchmove', e => {
+document.addEventListener('pointermove', e => {
   if (!drag) return;
   e.preventDefault();
-  const t = e.touches[0];
-  moveDrag(t.clientX, t.clientY);
+  moveDrag(e.clientX, e.clientY);
 }, { passive: false });
-document.addEventListener('touchend', e => {
+
+document.addEventListener('pointerup', e => {
   if (!drag) return;
-  const t = e.changedTouches[0];
-  endDrag(t.clientX, t.clientY);
+  endDrag(e.clientX, e.clientY);
 });
-document.addEventListener('touchcancel', () => {
+
+document.addEventListener('pointercancel', () => {
   if (!drag) return;
   drag.el.remove();
   drag = null;
