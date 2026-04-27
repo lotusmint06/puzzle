@@ -310,13 +310,14 @@ function moveDrag(clientX, clientY) {
   drag.el.style.left = clientX + 'px';
   drag.el.style.top  = vy + 'px';
 
-  // Compute which grid cell is under the center of the piece
-  computeMetrics();
+  // Compute which grid cell is under the top-left of the piece.
+  // The drag element is centered at (clientX, vy) via translate(-50%,-50%),
+  // so its top-left is offset by half its full size: (maxC+1)*cs/2 and (maxR+1)*cs/2.
   const maxR = Math.max(...drag.shape.map(([r]) => r));
   const maxC = Math.max(...drag.shape.map(([,c]) => c));
 
-  const piecePixelR = vy - (maxR * cellSize / 2);
-  const piecePixelC = clientX - (maxC * cellSize / 2);
+  const piecePixelR = vy - ((maxR + 1) * cellSize / 2);
+  const piecePixelC = clientX - ((maxC + 1) * cellSize / 2);
 
   const baseR = Math.round((piecePixelR - boardRect.top)  / cellSize);
   const baseC = Math.round((piecePixelC - boardRect.left) / cellSize);
@@ -368,6 +369,13 @@ document.addEventListener('touchend', e => {
   if (!drag) return;
   const t = e.changedTouches[0];
   endDrag(t.clientX, t.clientY);
+});
+document.addEventListener('touchcancel', () => {
+  if (!drag) return;
+  drag.el.remove();
+  drag = null;
+  renderGrid();
+  renderPieces();
 });
 
 document.getElementById('newBtn').addEventListener('click', init);
