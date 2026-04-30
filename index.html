@@ -143,6 +143,7 @@
   .game-card.c-snake::before    { background: linear-gradient(90deg, #6bcb77, #4d96ff); }
   .game-card.c-baseball::before { background: linear-gradient(90deg, #4d96ff, #6bcb77); }
   .game-card.c-connect::before  { background: linear-gradient(90deg, #ff6b6b, #ffd93d); }
+  .game-card.c-nono::before     { background: linear-gradient(90deg, #5a3e1b, #ff9f43); }
 
   .game-card:not(.coming-soon):hover {
     transform: translateY(-4px);
@@ -298,6 +299,19 @@
   .cc-e { background: rgba(0,0,0,0.25); }
   .cc-r { background: #ff6b6b; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2); }
   .cc-y { background: #ffd93d; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.15); }
+
+  /* ── 노노그램 ── */
+  .mini-nono {
+    background: #f0e6d3;
+    border-radius: 10px;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+  }
+  .nn   { aspect-ratio: 1; border-radius: 2px; border: 1.5px solid #d4c2a8; }
+  .nn-f { background: #5a3e1b; border-color: #3a2000; }
+  .nn-e { background: #e8d8c0; }
 
   /* ── 2048 미니 타일 그리드 아이콘 ── */
   .mini-grid {
@@ -554,6 +568,20 @@
       </div>
       <div class="card-body">
         <div class="card-title">사목</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
+
+
+    <a class="game-card c-nono" href="./nonogram/index.html">
+      <div class="mini-icon mini-nono">
+        <div class="nn nn-e"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-e"></div>
+        <div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div>
+        <div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div>
+        <div class="nn nn-e"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-e"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">노노그램</div>
       </div>
       <button class="play-btn">▶ 플레이</button>
     </a>
