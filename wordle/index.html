@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>워들 🟩</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fff9f0;
+    --board-bg: #f0e6d3;
+    --cell-bg: #e8d8c0;
+    --text: #5a3e1b;
+    --muted: #b0996e;
+    --green: #6bcb77;
+    --green-sh: #3a9a45;
+    --yellow: #ffd93d;
+    --yellow-sh: #c4a000;
+    --gray: #b0a090;
+    --gray-sh: #907860;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: calc(12px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
+  .shape:nth-child(1) { width: 220px; height: 220px; background: #6bcb77; top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 160px; height: 160px; background: #ffd93d; top: 55%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 110px; height: 110px; background: #ff6b6b; bottom: -30px; left: 30%; animation-delay: 4s; }
+  @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
+
+  .game-wrapper {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 10px;
+    width: 100%; max-width: 420px;
+  }
+
+  /* Header */
+  .header {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; padding: 0 2px;
+  }
+
+  .title {
+    font-size: clamp(28px, 8vw, 40px); font-weight: 900;
+    letter-spacing: -2px; line-height: 1;
+    background: linear-gradient(135deg, #6bcb77 0%, #4d96ff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    filter: drop-shadow(0 2px 0 rgba(0,0,0,0.07));
+  }
+
+  .header-right { display: flex; align-items: center; gap: 6px; }
+
+  .btn {
+    background: #6bcb77; color: white; border: none; border-radius: 10px;
+    padding: 8px 14px; font-family: 'Nunito', sans-serif; font-size: 13px;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 var(--green-sh);
+    white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--green-sh); }
+  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+  .btn.muted:active { box-shadow: 0 1px 0 #d4c2a8; }
+
+  /* Toast message */
+  .toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: #5a3e1b; color: white; border-radius: 12px;
+    padding: 10px 20px; font-size: 14px; font-weight: 800;
+    pointer-events: none; z-index: 100;
+    opacity: 0; transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* Legend */
+  .legend {
+    display: flex; gap: 12px; align-items: center;
+    font-size: 11px; font-weight: 800; color: var(--muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 4px; }
+  .legend-dot {
+    width: 14px; height: 14px; border-radius: 4px;
+    display: inline-block;
+  }
+  .ld-g { background: var(--green); }
+  .ld-y { background: var(--yellow); }
+  .ld-x { background: var(--gray); }
+
+  /* Board */
+  .board {
+    display: flex; flex-direction: column; gap: 5px;
+  }
+
+  .board-row {
+    display: flex; gap: 5px;
+  }
+
+  .tile {
+    width: 56px; height: 56px;
+    border: 3px solid #e0d0b8;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 900;
+    color: var(--text);
+    background: white;
+    user-select: none;
+    transition: border-color 0.1s;
+  }
+
+  @media (max-width: 340px) {
+    .tile { width: 48px; height: 48px; font-size: 22px; }
+  }
+
+  .tile.filled { border-color: #c0a888; }
+
+  .tile.correct { background: var(--green); border-color: var(--green); color: white; }
+  .tile.present { background: var(--yellow); border-color: var(--yellow); color: #7a5c00; }
+  .tile.absent  { background: var(--gray);  border-color: var(--gray);  color: white; }
+
+  @keyframes pop {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
+  }
+  @keyframes flip-in {
+    from { transform: rotateX(0deg); }
+    to   { transform: rotateX(-90deg); }
+  }
+  @keyframes flip-out {
+    from { transform: rotateX(90deg); }
+    to   { transform: rotateX(0deg); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    16% { transform: translateX(-8px); }
+    33% { transform: translateX(8px); }
+    50% { transform: translateX(-6px); }
+    66% { transform: translateX(6px); }
+    83% { transform: translateX(-3px); }
+  }
+  @keyframes bounce-in {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.15); }
+    70%  { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+
+  .tile.flip-in  { animation: flip-in  0.18s ease forwards; }
+  .tile.flip-out { animation: flip-out 0.18s ease forwards; }
+  .tile.pop      { animation: pop 0.1s ease; }
+  .board-row.shake { animation: shake 0.38s ease; }
+  .tile.bounce   { animation: bounce-in 0.4s ease; }
+
+  /* Keyboard */
+  .keyboard {
+    width: 100%;
+    display: flex; flex-direction: column; gap: 5px;
+    padding: 0 2px;
+  }
+
+  .key-row {
+    display: flex; justify-content: center; gap: 4px;
+  }
+
+  .key {
+    flex: 1;
+    max-width: 40px;
+    height: 52px;
+    border-radius: 8px;
+    background: #e8d8c0;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px; font-weight: 800;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: 0 3px 0 #d0c0a0;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  @media (max-width: 340px) {
+    .key { height: 46px; font-size: 13px; }
+  }
+
+  .key.wide { max-width: 58px; font-size: 12px; }
+
+  .key:active { transform: translateY(2px); box-shadow: 0 1px 0 #d0c0a0; }
+
+  .key.correct { background: var(--green); box-shadow: 0 3px 0 var(--green-sh); color: white; }
+  .key.present { background: var(--yellow); box-shadow: 0 3px 0 var(--yellow-sh); color: #7a5c00; }
+  .key.absent  { background: var(--gray);  box-shadow: 0 3px 0 var(--gray-sh);  color: white; }
+
+  /* Overlay */
+  .overlay {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px;
+    background: rgba(240, 225, 200, 0.92);
+    backdrop-filter: blur(4px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .overlay-emoji { font-size: 64px; animation: bounce-in 0.5s ease; }
+  .overlay-title { font-size: 30px; font-weight: 900; color: var(--text); }
+  .overlay-sub   { font-size: 15px; font-weight: 700; color: var(--muted); text-align: center; }
+  .overlay-answer {
+    font-size: 28px; font-weight: 900; letter-spacing: 4px;
+    color: var(--text);
+    background: white; border-radius: 14px;
+    padding: 12px 24px;
+    box-shadow: 0 4px 0 #d4c2a8;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-shapes">
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+</div>
+
+<div class="game-wrapper">
+
+  <div class="header">
+    <div class="title">Wordle</div>
+    <div class="header-right">
+      <button class="btn" id="newBtn" onclick="newGame()">새 게임</button>
+      <a href="../index.html" class="btn muted">🏠</a>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot ld-g"></span>정확</div>
+    <div class="legend-item"><span class="legend-dot ld-y"></span>있지만 위치 다름</div>
+    <div class="legend-item"><span class="legend-dot ld-x"></span>없음</div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="keyboard" id="keyboard"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-emoji" id="overlayEmoji"></div>
+  <div class="overlay-title" id="overlayTitle"></div>
+  <div class="overlay-sub" id="overlaySub"></div>
+  <div class="overlay-answer" id="overlayAnswer"></div>
+  <button class="btn" onclick="newGame()" style="margin-top:4px">▶ 새 게임</button>
+</div>
+
+<script>
+/* ── Word list ── */
+const WORDS = [
+  'ABOUT','ABOVE','ABUSE','ACUTE','ADMIT','ADOPT','ADULT','AFTER','AGAIN','AGENT',
+  'AGREE','AHEAD','ALARM','ALBUM','ALERT','ALIEN','ALIVE','ALLEY','ALLOW','ALONE',
+  'ALTER','ANGEL','ANGER','ANGLE','ANGRY','ANKLE','APART','APPLE','APPLY','ARENA',
+  'ARISE','ARMOR','ARSON','ASIDE','ATTIC','AUDIO','AUDIT','AVOID','AWAKE','AWARD',
+  'AWARE','AWFUL','BACON','BASIC','BASIN','BEACH','BEARD','BEAST','BEGIN','BEING',
+  'BELOW','BENCH','BIRTH','BLACK','BLADE','BLAME','BLANK','BLAST','BLAZE','BLEED',
+  'BLEND','BLESS','BLIND','BLOCK','BLOOD','BLOOM','BOARD','BOOST','BOOTH','BORED',
+  'BOUND','BRACE','BRAND','BRAVE','BREAD','BREAK','BREED','BRICK','BRIDE','BRIEF',
+  'BRING','BROKE','BROWN','BRUSH','BUILD','BUILT','BURST','CABLE','CANDY','CAUSE',
+  'CHAIR','CHALK','CHAOS','CHASE','CHEAP','CHEAT','CHECK','CHEEK','CHEER','CHESS',
+  'CHEST','CHIEF','CHILD','CIVIL','CLAIM','CLASH','CLASS','CLEAN','CLEAR','CLICK',
+  'CLIFF','CLIMB','CLOCK','CLOSE','CLOTH','CLOUD','CLOWN','COAST','COUNT','COURT',
+  'COVER','CRACK','CRAFT','CRANE','CRASH','CRAZY','CREEK','CRISP','CROWD','CROWN',
+  'CRUEL','CRUSH','CURVE','DAILY','DANCE','DEATH','DECAY','DENSE','DEPOT','DEPTH',
+  'DIRTY','DISCO','DITCH','DOUBT','DOUGH','DRAFT','DRAIN','DRAWN','DREAM','DRESS',
+  'DRINK','DRIVE','DROVE','DROWN','DUSTY','EAGLE','EARLY','EARTH','EIGHT','ELITE',
+  'EMPTY','ENEMY','ENJOY','ENTER','ENTRY','ERROR','EVERY','EXACT','EXIST','EXTRA',
+  'FABLE','FAITH','FALSE','FANCY','FATAL','FAULT','FEAST','FIELD','FIFTH','FIFTY',
+  'FIGHT','FILTH','FINAL','FIRST','FIXED','FLAME','FLASH','FLASK','FOCUS','FORCE',
+  'FORGE','FOUND','FRAME','FRANK','FRESH','FRONT','FROST','FROZE','FRUIT','GHOST',
+  'GLASS','GLOBE','GLOOM','GRACE','GRADE','GRAIN','GRAND','GRANT','GRAPE','GRASP',
+  'GRASS','GREAT','GREED','GREEN','GREET','GRIEF','GRILL','GROAN','GROUP','GROVE',
+  'GUARD','GUIDE','GUILD','HAPPY','HARSH','HEART','HEAVY','HONEY','HONOR','HORSE',
+  'HOTEL','HOUSE','HUMAN','HURRY','IDEAL','IMAGE','INDEX','INNER','INPUT','IRONY',
+  'JUDGE','JUICE','JUMBO','KNIFE','KNOCK','KNOWN','LABEL','LATER','LAUGH','LAYER',
+  'LEARN','LEASE','LEAVE','LEGAL','LEMON','LEVEL','LIGHT','LIMIT','LOBBY','LOCAL',
+  'LODGE','LOGIC','LOWER','LUCKY','LYRIC','MAGIC','MAJOR','MAKER','MANOR','MAPLE',
+  'MARCH','MATCH','MEDIA','METAL','MIGHT','MINOR','MIXED','MODEL','MONEY','MONTH',
+  'MORAL','MOVIE','MUSIC','NAIVE','NASTY','NAVAL','NERVE','NIGHT','NOBLE','NOISE',
+  'NORTH','NOVEL','OCEAN','OLIVE','ORBIT','ORDER','OTHER','OUTER','PAINT','PANEL',
+  'PANIC','PAPER','PARTY','PATCH','PAUSE','PEACE','PEARL','PETAL','PETTY','PHASE',
+  'PHONE','PHOTO','PIANO','PILOT','PITCH','PIXEL','PIZZA','PLACE','PLAIN','PLANE',
+  'PLANK','PLANT','PLATE','PLAZA','PLUCK','POINT','POKER','POLAR','POPPY','PORCH',
+  'POWER','PRESS','PRICE','PRIDE','PRIME','PRINT','PRIOR','PRIZE','PROBE','PROOF',
+  'PROSE','PROUD','PUPPY','PURSE','QUEEN','QUEST','RADAR','RAISE','RALLY','RANCH',
+  'RANGE','RAPID','RATIO','REACH','REACT','READY','REALM','REBEL','RELAX','REPLY',
+  'RESET','RIDER','RIDGE','RIGID','RISKY','RIVAL','ROBOT','ROCKY','ROUGE','ROUGH',
+  'ROUND','ROUTE','RULER','RUSTY','SAINT','SANDY','SAUCE','SAVVY','SCALE','SCENE',
+  'SCOUT','SERVE','SETUP','SEVEN','SHADE','SHAFT','SHAKE','SHAME','SHAPE','SHARE',
+  'SHARK','SHARP','SHEEP','SHEET','SHELF','SHELL','SHINY','SHIRT','SHOCK','SHORE',
+  'SHORT','SHOUT','SIGHT','SILLY','SINCE','SIXTH','SIXTY','SKILL','SKULL','SLASH',
+  'SLICK','SLIDE','SLOPE','SMALL','SMASH','SMILE','SMOKE','SNAKE','SOLAR','SOLID',
+  'SOLVE','SORRY','SPACE','SPARE','SPARK','SPEAK','SPELL','SPEND','SPICE','SPIKE',
+  'SPINE','SPOKE','SPORT','STACK','STAGE','STAIN','STAIR','STAKE','STALE','STAMP',
+  'STAND','START','STATE','STEAL','STEEL','STEEP','STERN','STICK','STIFF','STILL',
+  'STONE','STOOD','STORM','STORY','STOVE','STYLE','SUGAR','SUNNY','SUPER','SWIFT',
+  'SWORD','TABLE','TIGER','TIGHT','TIMER','TIRED','TITLE','TODAY','TOPIC','TOTAL',
+  'TOUCH','TOUGH','TOWER','TOXIC','TRACE','TRACK','TRADE','TRAIL','TRAIN','TRAIT',
+  'TREND','TRICK','TRIED','TRUCK','TRULY','TRUNK','TRUST','TRUTH','TUTOR','TWIST',
+  'UNCLE','ULTRA','UNDER','UNITY','UPPER','UPSET','URBAN','VALID','VALUE','VAULT',
+  'VIRAL','VITAL','VIVID','VOICE','VOTER','VOWEL','WATCH','WATER','WEAVE','WEIRD',
+  'WHALE','WHERE','WHICH','WHILE','WHITE','WHOLE','WHOSE','WOMAN','WORLD','WORRY',
+  'WORSE','WORST','WORTH','WOULD','WOUND','WRATH','WRONG','YACHT','YIELD','YOUNG',
+  'YOUTH','ZEBRA','ZESTY',
+];
+
+const WORD_SET = new Set(WORDS);
+
+/* ── State ── */
+let answer = '';
+let guesses = [];      // committed guesses
+let current = '';      // letters typed so far
+let gameOver = false;
+let currentRow = 0;
+
+/* ── DOM refs ── */
+const boardEl    = document.getElementById('board');
+const keyboardEl = document.getElementById('keyboard');
+const toastEl    = document.getElementById('toast');
+const overlayEl  = document.getElementById('overlay');
+
+/* ── Build board ── */
+function buildBoard() {
+  boardEl.innerHTML = '';
+  for (let r = 0; r < 6; r++) {
+    const row = document.createElement('div');
+    row.className = 'board-row';
+    row.id = `row-${r}`;
+    for (let c = 0; c < 5; c++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.id = `tile-${r}-${c}`;
+      row.appendChild(tile);
+    }
+    boardEl.appendChild(row);
+  }
+}
+
+/* ── Build keyboard ── */
+const KEY_ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['ENTER','Z','X','C','V','B','N','M','⌫'],
+];
+
+function buildKeyboard() {
+  keyboardEl.innerHTML = '';
+  KEY_ROWS.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'key-row';
+    row.forEach(k => {
+      const btn = document.createElement('button');
+      btn.className = 'key' + (k.length > 1 ? ' wide' : '');
+      btn.textContent = k;
+      btn.dataset.key = k;
+      btn.addEventListener('click', () => handleKey(k));
+      rowEl.appendChild(btn);
+    });
+    keyboardEl.appendChild(rowEl);
+  });
+}
+
+/* ── Input ── */
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
+  if (e.key === 'Enter') { handleKey('ENTER'); return; }
+  if (e.key === 'Backspace') { handleKey('⌫'); return; }
+  const letter = e.key.toUpperCase();
+  if (/^[A-Z]$/.test(letter)) handleKey(letter);
+});
+
+function handleKey(k) {
+  if (gameOver) return;
+
+  if (k === '⌫') {
+    if (current.length > 0) current = current.slice(0, -1);
+    renderCurrent();
+    return;
+  }
+
+  if (k === 'ENTER') {
+    submitGuess();
+    return;
+  }
+
+  if (/^[A-Z]$/.test(k) && current.length < 5) {
+    current += k;
+    renderCurrent();
+    const tile = document.getElementById(`tile-${currentRow}-${current.length - 1}`);
+    if (tile) {
+      tile.classList.remove('pop');
+      void tile.offsetWidth; // reflow
+      tile.classList.add('pop');
+    }
+  }
+}
+
+/* ── Render current typing ── */
+function renderCurrent() {
+  for (let c = 0; c < 5; c++) {
+    const tile = document.getElementById(`tile-${currentRow}-${c}`);
+    if (!tile) continue;
+    tile.textContent = current[c] || '';
+    tile.className = 'tile' + (current[c] ? ' filled' : '');
+  }
+}
+
+/* ── Submit ── */
+function submitGuess() {
+  if (current.length < 5) {
+    showToast('글자가 부족해요!');
+    shakeRow(currentRow);
+    return;
+  }
+  if (!WORD_SET.has(current)) {
+    showToast('단어 목록에 없는 단어예요');
+    shakeRow(currentRow);
+    return;
+  }
+
+  const result = checkGuess(current);
+  guesses.push({ word: current, result });
+  revealRow(currentRow, result, () => {
+    updateKeyboard();
+    const won = result.every(r => r === 'correct');
+    if (won) {
+      gameOver = true;
+      setTimeout(() => showResult(true), 200);
+    } else if (currentRow === 5) {
+      gameOver = true;
+      setTimeout(() => showResult(false), 200);
+    }
+  });
+
+  currentRow++;
+  current = '';
+}
+
+/* ── Check guess ── */
+function checkGuess(guess) {
+  const result = Array(5).fill('absent');
+  const ansArr = answer.split('');
+  const gueArr = guess.split('');
+  const ansRem = [...ansArr];
+
+  // Pass 1: exact matches
+  for (let i = 0; i < 5; i++) {
+    if (gueArr[i] === ansArr[i]) {
+      result[i] = 'correct';
+      ansRem[i] = null;
+      gueArr[i] = null;
+    }
+  }
+  // Pass 2: present elsewhere
+  for (let i = 0; i < 5; i++) {
+    if (gueArr[i] === null) continue;
+    const idx = ansRem.indexOf(gueArr[i]);
+    if (idx !== -1) {
+      result[i] = 'present';
+      ansRem[idx] = null;
+    }
+  }
+  return result;
+}
+
+/* ── Reveal row with flip animation ── */
+function revealRow(row, result, onDone) {
+  const FLIP = 180; // ms per tile flip cycle
+  const GAP  = 100; // ms stagger between tiles
+
+  for (let c = 0; c < 5; c++) {
+    const tile = document.getElementById(`tile-${row}-${c}`);
+    const delay = c * GAP;
+    setTimeout(() => {
+      tile.classList.add('flip-in');
+      setTimeout(() => {
+        tile.classList.remove('flip-in', 'filled');
+        tile.classList.add(result[c], 'flip-out');
+        setTimeout(() => tile.classList.remove('flip-out'), FLIP);
+      }, FLIP);
+    }, delay);
+  }
+
+  const totalTime = 4 * GAP + FLIP * 2;
+  setTimeout(onDone, totalTime + 50);
+}
+
+/* ── Shake row ── */
+function shakeRow(row) {
+  const rowEl = document.getElementById(`row-${row}`);
+  if (!rowEl) return;
+  rowEl.classList.remove('shake');
+  void rowEl.offsetWidth;
+  rowEl.classList.add('shake');
+  setTimeout(() => rowEl.classList.remove('shake'), 400);
+}
+
+/* ── Update keyboard colors ── */
+function updateKeyboard() {
+  const priority = { correct: 3, present: 2, absent: 1 };
+  const letterState = {};
+
+  guesses.forEach(({ word, result }) => {
+    word.split('').forEach((letter, i) => {
+      const cur = letterState[letter];
+      if (!cur || priority[result[i]] > priority[cur]) {
+        letterState[letter] = result[i];
+      }
+    });
+  });
+
+  keyboardEl.querySelectorAll('.key').forEach(btn => {
+    const k = btn.dataset.key;
+    if (letterState[k]) {
+      btn.className = 'key' + (k.length > 1 ? ' wide' : '') + ' ' + letterState[k];
+    }
+  });
+}
+
+/* ── Result overlay ── */
+function showResult(won) {
+  const WIN_MSGS  = ['완벽해요!', '대단해요!', '훌륭해요!', '잘했어요!', '좋아요!', '휴, 아슬아슬!'];
+  const LOSE_MSGS = ['아쉬워요 😢'];
+
+  document.getElementById('overlayEmoji').textContent  = won ? '🎉' : '😢';
+  document.getElementById('overlayTitle').textContent  = won ? WIN_MSGS[currentRow - 1] || '잘했어요!' : '아쉬워요!';
+  document.getElementById('overlaySub').textContent    = won
+    ? `${currentRow}번 만에 맞혔어요!`
+    : '정답을 확인하세요';
+  document.getElementById('overlayAnswer').textContent = won ? '' : answer;
+  document.getElementById('overlayAnswer').style.display = won ? 'none' : '';
+
+  overlayEl.classList.add('show');
+}
+
+/* ── Toast ── */
+let toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1600);
+}
+
+/* ── New game ── */
+function newGame() {
+  answer    = WORDS[Math.floor(Math.random() * WORDS.length)];
+  guesses   = [];
+  current   = '';
+  gameOver  = false;
+  currentRow = 0;
+
+  overlayEl.classList.remove('show');
+  buildBoard();
+  buildKeyboard();
+}
+
+/* ── Init ── */
+newGame();
+</script>
+</body>
+</html>

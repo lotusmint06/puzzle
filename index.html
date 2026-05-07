@@ -144,6 +144,7 @@
   .game-card.c-baseball::before { background: linear-gradient(90deg, #4d96ff, #6bcb77); }
   .game-card.c-connect::before  { background: linear-gradient(90deg, #ff6b6b, #ffd93d); }
   .game-card.c-nono::before     { background: linear-gradient(90deg, #5a3e1b, #ff9f43); }
+  .game-card.c-wordle::before   { background: linear-gradient(90deg, #6bcb77, #4d96ff); }
 
   .game-card:not(.coming-soon):hover {
     transform: translateY(-4px);
@@ -572,6 +573,31 @@
       <button class="play-btn">▶ 플레이</button>
     </a>
 
+
+    <a class="game-card c-wordle" href="./wordle/index.html">
+      <div class="mini-icon" style="background:#1e2a1e;border-radius:10px;box-shadow:0 3px 0 #d4c2a8;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:5px;width:64px;height:64px;">
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#b0a090;"></div>
+        <div style="border-radius:3px;background:#b0a090;"></div>
+        <div style="border-radius:3px;background:#ffd93d;"></div>
+        <div style="border-radius:3px;background:#b0a090;"></div>
+        <div style="border-radius:3px;background:#b0a090;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#b0a090;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#ffd93d;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+        <div style="border-radius:3px;background:#6bcb77;"></div>
+      </div>
+      <div class="card-body">
+        <div class="card-title">워들</div>
+        <div class="card-desc">5글자 단어를 맞춰보세요</div>
+      </div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
 
     <a class="game-card c-nono" href="./nonogram/index.html">
       <div class="mini-icon mini-nono">
