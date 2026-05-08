@@ -3,620 +3,389 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puzzle Hub 🎮</title>
-<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<title>Puzzle Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #fff9f0;
-    --card-bg: #fff4e6;
-    --board-bg: #f0e6d3;
-    --cell-bg: #e8d8c0;
-    --text: #5a3e1b;
-    --muted: #b0996e;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 16px 60px;
-    overflow-x: hidden;
-  }
-
-  /* Floating shapes */
-  .bg-shapes {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .shape {
-    position: absolute;
-    border-radius: 50%;
-    opacity: 0.10;
-    animation: floatShape 8s ease-in-out infinite;
-  }
-  .shape:nth-child(1) { width: 260px; height: 260px; background: #ff6b6b; top: -80px; left: -80px; animation-delay: 0s; }
-  .shape:nth-child(2) { width: 180px; height: 180px; background: #ffd93d; top: 55%; right: -50px; animation-delay: 2s; }
-  .shape:nth-child(3) { width: 130px; height: 130px; background: #6bcb77; bottom: -40px; left: 25%; animation-delay: 4s; }
-  .shape:nth-child(4) { width: 100px; height: 100px; background: #4d96ff; top: 35%; left: -30px; animation-delay: 1s; }
-  .shape:nth-child(5) { width: 80px; height: 80px; background: #a78bfa; bottom: 20%; right: 10%; animation-delay: 3s; }
-
-  @keyframes floatShape {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50%       { transform: translateY(-24px) scale(1.06); }
-  }
-
-  /* Layout */
-  .wrapper {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 600px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-  }
-
-  /* Header */
-  .header {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    animation: fadeDown 0.5s ease both;
-  }
-
-  .logo {
-    font-size: clamp(48px, 14vw, 72px);
-    font-weight: 900;
-    letter-spacing: -3px;
-    line-height: 1;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 45%, #6bcb77 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 3px 0 rgba(0,0,0,0.07));
-  }
-
-  .subtitle {
-    font-size: clamp(14px, 4vw, 18px);
-    font-weight: 800;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
-
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Game grid */
-  .game-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    width: 100%;
-  }
-
-  /* Game card */
-  .game-card {
-    background: var(--card-bg);
-    border-radius: 20px;
-    padding: 20px 16px 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 6px 0 #e8d5b0, 0 10px 30px rgba(0,0,0,0.07);
-    text-decoration: none;
-    color: inherit;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-    animation: fadeUp 0.5s ease both;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .game-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    border-radius: 24px 24px 0 0;
-  }
-
-  .game-card.c-2048::before  { background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77); }
-  .game-card.c-sudoku::before { background: linear-gradient(90deg, #ffd93d, #4d96ff); }
-  .game-card.c-mine::before   { background: linear-gradient(90deg, #ff6b6b, #ffd93d); }
-  .game-card.c-block::before  { background: linear-gradient(90deg, #ff6b6b, #4d96ff); }
-  .game-card.c-pour::before   { background: linear-gradient(90deg, #ff6b6b, #ffd93d, #4d96ff); }
-  .game-card.c-snake::before    { background: linear-gradient(90deg, #6bcb77, #4d96ff); }
-  .game-card.c-baseball::before { background: linear-gradient(90deg, #4d96ff, #6bcb77); }
-  .game-card.c-connect::before  { background: linear-gradient(90deg, #ff6b6b, #ffd93d); }
-  .game-card.c-nono::before     { background: linear-gradient(90deg, #5a3e1b, #ff9f43); }
-  .game-card.c-wordle::before   { background: linear-gradient(90deg, #6bcb77, #4d96ff); }
-
-  .game-card:not(.coming-soon):hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 0 #e8d5b0, 0 16px 40px rgba(0,0,0,0.10);
-  }
-  .game-card:not(.coming-soon):active {
-    transform: translateY(2px);
-    box-shadow: 0 3px 0 #e8d5b0;
-  }
-
-  .game-card.coming-soon {
-    opacity: 0.55;
-    cursor: default;
-    filter: grayscale(0.3);
-  }
-
-  /* ── 공통 미니 아이콘 ── */
-  .mini-icon {
-    width: 64px; height: 64px;
-    border-radius: 10px;
-    box-shadow: 0 3px 0 #d4c2a8;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  /* ── Snake ── */
-  .mini-snake {
-    background: #1e2240;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
-  }
-  .sn   { border-radius: 2px; background: transparent; }
-  .sn-h { background: #4d96ff; border-radius: 4px; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3); }
-  .sn-b { background: #6bcb77; box-shadow: 0 1px 0 #3a9a45; }
-  .sn-t { background: #54a860; border-radius: 2px; } /* tail */
-  .sn-f { background: #ff6b6b; border-radius: 50%; box-shadow: 0 1px 0 #c43c3c; }
-
-  /* ── Puzzle Pour ── */
-  .mini-pour {
-    background: #f0e6d3;
-    padding: 7px 6px 5px;
-    display: flex;
-    gap: 5px;
-    align-items: flex-end;
-  }
-  .mp-tube {
-    flex: 1;
-    border: 2px solid #c8b898;
-    border-top: none;
-    border-radius: 0 0 7px 7px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    height: 50px;
-  }
-  .mp-seg { flex: 1; }
-  .mp-e   { background: transparent; }
-  .mp-r   { background: #ff6b6b; }
-  .mp-b   { background: #4d96ff; }
-  .mp-y   { background: #ffd93d; }
-  .mp-g   { background: #6bcb77; }
-  .mp-p   { background: #a78bfa; }
-
-  /* ── Sudoku ── */
-  .mini-sudoku {
-    background: #fff4e6;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0;
-    border: 2px solid #c8b898;
-  }
-  .sdk {
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 900;
-    border: 0.5px solid #e8d8c0;
-    aspect-ratio: 1;
-  }
-  .sdk.box-r { border-right: 1.5px solid #c8b898; }
-  .sdk.box-b { border-bottom: 1.5px solid #c8b898; }
-  .sdk.gv  { color: #5a3e1b; }
-  .sdk.fil { color: #4d96ff; }
-  .sdk.em  { color: transparent; }
-
-  /* ── Puzzle Drop ── */
-  .mini-drop {
-    background: #f0e6d3;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px;
-  }
-  .pd    { border-radius: 2px; }
-  .pd-e  { background: #e8d8c0; }
-  .pd-r  { background: #ff6b6b; box-shadow: 0 2px 0 #c43c3c; }
-  .pd-b  { background: #4d96ff; box-shadow: 0 2px 0 #2060c0; }
-  .pd-y  { background: #ffd93d; box-shadow: 0 2px 0 #c4a000; }
-  .pd-g  { background: #6bcb77; box-shadow: 0 2px 0 #3a9a45; }
-  .pd-p  { background: #a78bfa; box-shadow: 0 2px 0 #7c5cda; }
-
-  /* ── Minesweeper ── */
-  .mini-ms {
-    background: #f0e6d3;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 3px;
-  }
-  .mc {
-    border-radius: 3px; aspect-ratio: 1;
-    background: #e8d8c0;
-    box-shadow: 0 2px 0 #d0c0a8;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 8px; font-weight: 900;
-  }
-  .mc.rev  { background: #f5ede0; box-shadow: none; }
-  .mc.n1   { color: #4d96ff; }
-  .mc.n2   { color: #6bcb77; }
-  .mc.n3   { color: #ff6b6b; }
-  .mc.flag { background: #fff4e6; font-size: 9px; }
-  .mc.mine { background: #ff6b6b; font-size: 9px; }
-
-  /* ── 숫자 야구 ── */
-  .mini-baseball {
-    background: #1e2a4a;
-    border-radius: 10px;
-    padding: 8px 6px;
-    display: flex; flex-direction: column;
-    gap: 5px; align-items: center; justify-content: center;
-  }
-  .mb-row { display: flex; gap: 4px; }
-  .mb-d {
-    width: 16px; height: 16px; border-radius: 4px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 900; color: white;
-  }
-  .mb-s { background: #4d96ff; }
-  .mb-b { background: #6bcb77; }
-  .mb-o { background: #4a3a2a; color: #8b7a6a; }
-  .mb-label { font-size: 8px; font-weight: 800; color: #8baad4; letter-spacing: 1px; }
-
-  /* ── 사목 ── */
-  .mini-connect {
-    background: #c4880a;
-    border-radius: 10px;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 3px;
-  }
-  .cc { aspect-ratio: 1; border-radius: 50%; }
-  .cc-e { background: rgba(0,0,0,0.25); }
-  .cc-r { background: #ff6b6b; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2); }
-  .cc-y { background: #ffd93d; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.15); }
-
-  /* ── 노노그램 ── */
-  .mini-nono {
-    background: #f0e6d3;
-    border-radius: 10px;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 3px;
-  }
-  .nn   { aspect-ratio: 1; border-radius: 2px; border: 1.5px solid #d4c2a8; }
-  .nn-f { background: #5a3e1b; border-color: #3a2000; }
-  .nn-e { background: #e8d8c0; }
-
-  /* ── 2048 미니 타일 그리드 아이콘 ── */
-  .mini-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
-    width: 64px;
-    height: 64px;
-    background: #e8d5b0;
-    border-radius: 10px;
-    padding: 5px;
-    box-shadow: 0 3px 0 #d4c2a8;
-  }
-  .mini-tile {
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 900;
-    color: white;
-  }
-  .mt-8    { background: #ff9f43; box-shadow: 0 2px 0 #c47820; }
-  .mt-16   { background: #ff6b6b; box-shadow: 0 2px 0 #c43c3c; }
-  .mt-128  { background: #ffd93d; color: #7a5c00; box-shadow: 0 2px 0 #c4a000; }
-  .mt-2048 { background: linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77); box-shadow: 0 2px 0 #888; font-size: 8px; }
-
-  .card-body { width: 100%; text-align: center; }
-
-  .card-title {
-    font-size: 18px;
-    font-weight: 900;
-    color: var(--text);
-    letter-spacing: -0.5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-
-  .badge-soon {
-    font-size: 10px;
-    font-weight: 800;
-    background: #e2e8f0;
-    color: #718096;
-    border-radius: 6px;
-    padding: 2px 7px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  .badge-lock {
-    font-size: 14px;
-  }
-
-  .card-desc {
-    margin-top: 4px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .play-btn {
-    margin-top: 0;
-    background: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 4px 0 #c43c3c;
-    transition: transform 0.1s, box-shadow 0.1s;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-    pointer-events: none; /* card handles click */
-  }
-
-  .game-card:not(.coming-soon):hover .play-btn {
-    background: #ff5252;
-  }
-
-  .game-card:not(.coming-soon):active .play-btn {
-    transform: translateY(3px);
-    box-shadow: 0 1px 0 #c43c3c;
-  }
-
-  .coming-soon .play-btn {
-    background: #cbd5e0;
-    box-shadow: 0 4px 0 #a0aec0;
-    color: #718096;
-  }
-
-  /* Stagger cards */
-  .game-card:nth-child(1) { animation-delay: 0.1s; }
-  .game-card:nth-child(2) { animation-delay: 0.2s; }
-  .game-card:nth-child(3) { animation-delay: 0.3s; }
-  .game-card:nth-child(4) { animation-delay: 0.4s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* Footer */
-  .footer {
-    font-size: 12px;
-    font-weight: 700;
-    color: #d4b896;
-    letter-spacing: 0.3px;
-    animation: fadeUp 0.5s 0.5s ease both;
-  }
+:root {
+  --bg:        #FFF8F0;
+  --surface:   #FFFFFF;
+  --fg:        #2C1A00;
+  --muted:     #9E8060;
+  --border:    #E0CCAF;
+  --shadow:    #CCBA9C;
+  --orange:    #FF6B35;
+  --orange-dk: #D44E1A;
+  --amber:     #FFB830;
+  --amber-dk:  #C78A00;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 40px 16px 60px; overflow-x: hidden;
+}
+.bg-shapes { position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden; }
+.shape { position:absolute;border-radius:50%;animation:floatShape 9s ease-in-out infinite; }
+.shape:nth-child(1){width:340px;height:340px;background:var(--orange);opacity:.07;top:-130px;left:-110px}
+.shape:nth-child(2){width:240px;height:240px;background:var(--amber);opacity:.09;top:48%;right:-90px;animation-delay:2.5s}
+.shape:nth-child(3){width:130px;height:130px;background:var(--orange);opacity:.06;bottom:8%;left:16%;animation-delay:4.5s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+.wrapper{position:relative;z-index:1;width:100%;max-width:600px;display:flex;flex-direction:column;align-items:center;gap:28px}
+.header{display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeDown .4s ease both}
+.logo-row{display:flex;align-items:center;gap:14px}
+.logo-icon{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:56px;height:56px;background:#EDDDCA;border-radius:16px;padding:7px;box-shadow:0 5px 0 var(--shadow);flex-shrink:0}
+.li{border-radius:6px}
+.li-1{background:#FF9F43;box-shadow:0 2px 0 #C47820}
+.li-2{background:#4DC07A;box-shadow:0 2px 0 #2B9555}
+.li-3{background:#4A8FE7;box-shadow:0 2px 0 #2A65BD}
+.li-4{background:var(--amber);box-shadow:0 2px 0 var(--amber-dk)}
+.logo-text{font-size:clamp(38px,10vw,54px);font-weight:900;color:var(--fg);letter-spacing:-2.5px;line-height:1}
+.logo-text em{font-style:normal;color:var(--orange)}
+.subtitle{font-size:clamp(13px,3.5vw,15px);font-weight:800;color:var(--muted)}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+.game-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%}
+.game-card{background:var(--surface);border-radius:20px;padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;box-shadow:0 6px 0 var(--shadow);border:1.5px solid var(--border);text-decoration:none;color:inherit;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;animation:fadeUp .45s ease both;position:relative}
+.game-card:not(.coming-soon):hover{transform:translateY(-4px);box-shadow:0 10px 0 var(--shadow)}
+.game-card:not(.coming-soon):active{transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
+.game-card.coming-soon{opacity:.48;cursor:default}
+.game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.cat-pill{position:absolute;top:10px;right:10px;font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--muted);border:1px solid var(--border);line-height:1.4}
+.mini-icon{width:64px;height:64px;border-radius:10px;box-shadow:0 3px 0 var(--shadow);flex-shrink:0;overflow:hidden;display:block}
+.mini-icon svg{display:block}
+.card-body{width:100%;text-align:center}
+.card-title{font-size:17px;font-weight:900;color:var(--fg);letter-spacing:-.4px;display:flex;align-items:center;justify-content:center;gap:5px}
+.card-desc{margin-top:4px;font-size:12px;font-weight:700;color:var(--muted);line-height:1.45}
+.play-btn{background:var(--orange);color:white;border:none;border-radius:12px;padding:10px 0;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--orange-dk);letter-spacing:.3px;width:100%;pointer-events:none;transition:transform .1s,box-shadow .1s}
+.game-card:not(.coming-soon):active .play-btn{transform:translateY(3px);box-shadow:0 1px 0 var(--orange-dk)}
+.coming-soon .play-btn{background:var(--border);box-shadow:0 4px 0 var(--shadow);color:var(--muted)}
+.footer{font-size:12px;font-weight:700;color:var(--muted);opacity:.7;animation:fadeUp .4s .55s ease both}
 </style>
 </head>
 <body>
-
-<div class="bg-shapes">
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
-</div>
-
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
 <div class="wrapper">
-
   <div class="header">
-    <div class="logo">Puzzle</div>
-    <div class="subtitle">게임을 골라보세요 🎮</div>
+    <div class="logo-row">
+      <div class="logo-icon">
+        <div class="li li-1"></div><div class="li li-2"></div>
+        <div class="li li-3"></div><div class="li li-4"></div>
+      </div>
+      <div class="logo-text"><em>P</em>uzzle</div>
+    </div>
+    <div class="subtitle">게임을 골라보세요 — 모두 무료</div>
   </div>
 
   <div class="game-grid">
 
-    <a class="game-card c-2048" href="./2048/index.html">
-      <div class="mini-grid">
-        <div class="mini-tile mt-8">8</div>
-        <div class="mini-tile mt-16">16</div>
-        <div class="mini-tile mt-128">128</div>
-        <div class="mini-tile mt-2048">2048</div>
+    <a class="game-card" href="./2048/index.html">
+      <div class="cat-pill">숫자</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="g-2048" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B35"/><stop offset="55%" stop-color="#FFD93D"/><stop offset="100%" stop-color="#4DC07A"/></linearGradient></defs>
+          <rect width="64" height="64" fill="#EDDDCA"/>
+          <rect x="5" y="5" width="25" height="25" rx="5" fill="#FF9F43"/>
+          <text x="17.5" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">8</text>
+          <rect x="34" y="5" width="25" height="25" rx="5" fill="#FF6B35"/>
+          <text x="46.5" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="11" fill="white">16</text>
+          <rect x="5" y="34" width="25" height="25" rx="5" fill="#FFD93D"/>
+          <text x="17.5" y="50.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#7A5C00">128</text>
+          <rect x="34" y="34" width="25" height="25" rx="5" fill="url(#g-2048)"/>
+          <text x="46.5" y="49.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="7" fill="white">2048</text>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">2048</div>
-      </div>
+      <div class="card-body"><div class="card-title">2048</div><div class="card-desc">타일을 합쳐 2048을 만들어요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-snake" href="./snake/index.html">
-      <div class="mini-icon mini-snake">
-        <div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div>
-        <div class="sn"></div><div class="sn-h"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div>
-        <div class="sn"></div><div class="sn-b"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div>
-        <div class="sn"></div><div class="sn-b"></div><div class="sn-b"></div><div class="sn-t"></div><div class="sn"></div>
-        <div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn"></div><div class="sn-f"></div>
+    <a class="game-card" href="./snake/index.html">
+      <div class="cat-pill">아케이드</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#1E2240"/>
+          <g fill="#2A2E52"><circle cx="10" cy="10" r="1.2"/><circle cx="22" cy="10" r="1.2"/><circle cx="34" cy="10" r="1.2"/><circle cx="46" cy="10" r="1.2"/><circle cx="58" cy="10" r="1.2"/><circle cx="10" cy="22" r="1.2"/><circle cx="58" cy="22" r="1.2"/><circle cx="10" cy="34" r="1.2"/><circle cx="58" cy="34" r="1.2"/><circle cx="10" cy="46" r="1.2"/><circle cx="58" cy="46" r="1.2"/><circle cx="10" cy="58" r="1.2"/><circle cx="22" cy="58" r="1.2"/><circle cx="34" cy="58" r="1.2"/><circle cx="46" cy="58" r="1.2"/><circle cx="58" cy="58" r="1.2"/></g>
+          <rect x="22" y="40" width="12" height="12" rx="4" fill="#3D8A4D"/>
+          <rect x="22" y="26" width="12" height="12" rx="4" fill="#52B063"/>
+          <rect x="22" y="12" width="12" height="12" rx="4" fill="#6BCB77"/>
+          <rect x="36" y="12" width="12" height="12" rx="4" fill="#6BCB77"/>
+          <rect x="50" y="12" width="12" height="12" rx="5" fill="#4D96FF"/>
+          <circle cx="55" cy="16" r="2" fill="white"/>
+          <circle cx="55.8" cy="16" r="1" fill="#1E2240"/>
+          <circle cx="50" cy="50" r="7" fill="#FF5252"/>
+          <circle cx="47.5" cy="47.5" r="2.5" fill="rgba(255,255,255,0.35)"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">스네이크</div>
-      </div>
+      <div class="card-body"><div class="card-title">스네이크</div><div class="card-desc">먹이를 먹어 몸을 늘려가요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-pour" href="./puzzlepour/index.html">
-      <div class="mini-icon mini-pour">
-        <div class="mp-tube">
-          <div class="mp-seg mp-e"></div>
-          <div class="mp-seg mp-y"></div>
-          <div class="mp-seg mp-r"></div>
-          <div class="mp-seg mp-r"></div>
-        </div>
-        <div class="mp-tube">
-          <div class="mp-seg mp-b"></div>
-          <div class="mp-seg mp-b"></div>
-          <div class="mp-seg mp-g"></div>
-          <div class="mp-seg mp-g"></div>
-        </div>
-        <div class="mp-tube">
-          <div class="mp-seg mp-e"></div>
-          <div class="mp-seg mp-e"></div>
-          <div class="mp-seg mp-p"></div>
-          <div class="mp-seg mp-y"></div>
-        </div>
+    <a class="game-card" href="./puzzlepour/index.html">
+      <div class="cat-pill">퍼즐</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="pc1"><rect x="8" y="7" width="12" height="49" rx="6"/></clipPath>
+            <clipPath id="pc2"><rect x="26" y="7" width="12" height="49" rx="6"/></clipPath>
+            <clipPath id="pc3"><rect x="44" y="7" width="12" height="49" rx="6"/></clipPath>
+          </defs>
+          <rect width="64" height="64" fill="#F5EDE0"/>
+          <rect x="7" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
+          <rect x="8" y="33" width="12" height="12" fill="#FFD93D" clip-path="url(#pc1)"/>
+          <rect x="8" y="45" width="12" height="12" fill="#FF6B6B" clip-path="url(#pc1)"/>
+          <rect x="25" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
+          <rect x="26" y="19" width="12" height="13" fill="#4D96FF" clip-path="url(#pc2)"/>
+          <rect x="26" y="32" width="12" height="13" fill="#4D96FF" clip-path="url(#pc2)"/>
+          <rect x="26" y="45" width="12" height="12" fill="#6BCB77" clip-path="url(#pc2)"/>
+          <rect x="43" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
+          <rect x="44" y="45" width="12" height="12" fill="#A78BFA" clip-path="url(#pc3)"/>
+          <rect x="9" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc1)"/>
+          <rect x="27" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc2)"/>
+          <rect x="45" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc3)"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">Puzzle Pour</div>
-      </div>
+      <div class="card-body"><div class="card-title">Puzzle Pour</div><div class="card-desc">색을 맞춰 시험관을 채워요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-sudoku" href="./sudoku/index.html">
-      <div class="mini-icon mini-sudoku">
-        <div class="sdk gv box-r box-b">1</div><div class="sdk em box-b">·</div><div class="sdk fil box-b">3</div>
-        <div class="sdk em box-r">·</div><div class="sdk gv">5</div><div class="sdk fil">6</div>
-        <div class="sdk fil box-r">7</div><div class="sdk gv">8</div><div class="sdk em">·</div>
+    <a class="game-card" href="./sudoku/index.html">
+      <div class="cat-pill">숫자</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#FFF4E6"/>
+          <rect x="3" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/>
+          <rect x="3" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/>
+          <rect x="3" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/>
+          <rect x="3" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/>
+          <rect x="2" y="2" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+          <rect x="33" y="2" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+          <rect x="2" y="33" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+          <rect x="33" y="33" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+          <text x="9.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">1</text>
+          <text x="39.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">2</text>
+          <text x="24.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">3</text>
+          <text x="54.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">4</text>
+          <text x="9.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">2</text>
+          <text x="24.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">4</text>
+          <text x="54.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">3</text>
+          <text x="9.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">4</text>
+          <text x="39.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">1</text>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">스도쿠</div>
-      </div>
+      <div class="card-body"><div class="card-title">스도쿠</div><div class="card-desc">숫자를 채워 퍼즐을 완성해요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-block" href="./puzzledrop/index.html">
-      <div class="mini-icon mini-drop">
-        <div class="pd pd-e"></div><div class="pd pd-e"></div><div class="pd pd-e"></div><div class="pd pd-e"></div><div class="pd pd-e"></div>
-        <div class="pd pd-e"></div><div class="pd pd-b"></div><div class="pd pd-b"></div><div class="pd pd-e"></div><div class="pd pd-e"></div>
-        <div class="pd pd-e"></div><div class="pd pd-b"></div><div class="pd pd-r"></div><div class="pd pd-r"></div><div class="pd pd-e"></div>
-        <div class="pd pd-g"></div><div class="pd pd-g"></div><div class="pd pd-r"></div><div class="pd pd-r"></div><div class="pd pd-y"></div>
-        <div class="pd pd-g"></div><div class="pd pd-p"></div><div class="pd pd-p"></div><div class="pd pd-y"></div><div class="pd pd-y"></div>
+    <a class="game-card" href="./puzzledrop/index.html">
+      <div class="cat-pill">퍼즐</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#F0E6D3"/>
+          <rect x="27" y="15" width="10" height="10" rx="2" fill="#4D96FF"/>
+          <rect x="27" y="27" width="10" height="10" rx="2" fill="#4D96FF"/>
+          <rect x="39" y="27" width="10" height="10" rx="2" fill="#6BCB77"/>
+          <rect x="3"  y="39" width="10" height="10" rx="2" fill="#6BCB77"/>
+          <rect x="15" y="39" width="10" height="10" rx="2" fill="#6BCB77"/>
+          <rect x="27" y="39" width="10" height="10" rx="2" fill="#FF6B6B"/>
+          <rect x="39" y="39" width="10" height="10" rx="2" fill="#FF6B6B"/>
+          <rect x="51" y="39" width="10" height="10" rx="2" fill="#FFD93D"/>
+          <rect x="3"  y="51" width="10" height="10" rx="2" fill="#A78BFA"/>
+          <rect x="15" y="51" width="10" height="10" rx="2" fill="#A78BFA"/>
+          <rect x="27" y="51" width="10" height="10" rx="2" fill="#FF6B6B"/>
+          <rect x="39" y="51" width="10" height="10" rx="2" fill="#FFD93D"/>
+          <rect x="51" y="51" width="10" height="10" rx="2" fill="#FFD93D"/>
+          <rect x="3"  y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+          <rect x="15" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+          <rect x="27" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+          <rect x="39" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+          <rect x="51" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">Puzzle Drop</div>
-      </div>
+      <div class="card-body"><div class="card-title">Puzzle Drop</div><div class="card-desc">블록을 쌓아 줄을 없애요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-mine" href="./minesweeper/index.html">
-      <div class="mini-icon mini-ms">
-        <div class="mc"></div><div class="mc"></div><div class="mc rev n1">1</div><div class="mc rev n2">2</div>
-        <div class="mc flag">🚩</div><div class="mc rev n1">1</div><div class="mc rev">  </div><div class="mc rev n1">1</div>
-        <div class="mc"></div><div class="mc rev n2">2</div><div class="mc rev n1">1</div><div class="mc rev">  </div>
-        <div class="mc"></div><div class="mc"></div><div class="mc rev n3">3</div><div class="mc mine">💣</div>
+    <a class="game-card" href="./minesweeper/index.html">
+      <div class="cat-pill">전략</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#F0E6D3"/>
+          <rect x="3"  y="3"  width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="3"  width="13" height="6" rx="3" fill="#EAE0CC"/>
+          <rect x="18" y="3"  width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="18" y="3"  width="13" height="6" rx="3" fill="#EAE0CC"/>
+          <rect x="3"  y="33" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="33" width="13" height="6" rx="3" fill="#EAE0CC"/>
+          <rect x="3"  y="48" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="48" width="13" height="6" rx="3" fill="#EAE0CC"/>
+          <rect x="18" y="48" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="18" y="48" width="13" height="6" rx="3" fill="#EAE0CC"/>
+          <rect x="33" y="3"  width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="48" y="3"  width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="18" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="33" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="48" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="18" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="33" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="48" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="33" y="48" width="13" height="13" rx="3" fill="#F8F0E4"/>
+          <rect x="3"  y="18" width="13" height="13" rx="3" fill="#FFF4E6"/>
+          <rect x="48" y="48" width="13" height="13" rx="3" fill="#FF6B6B"/>
+          <text x="39.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+          <text x="54.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#6BCB77">2</text>
+          <text x="24.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+          <text x="54.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+          <text x="24.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#6BCB77">2</text>
+          <text x="39.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+          <text x="39.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#FF5252">3</text>
+          <rect x="8" y="19" width="2" height="9" rx="1" fill="#8B6040"/>
+          <polygon points="10,19 10,24 15,21.5" fill="#FF4444"/>
+          <circle cx="54.5" cy="54.5" r="4" fill="#2C1A00"/>
+          <line x1="54.5" y1="49" x2="54.5" y2="60" stroke="#2C1A00" stroke-width="1.5"/>
+          <line x1="49" y1="54.5" x2="60" y2="54.5" stroke="#2C1A00" stroke-width="1.5"/>
+          <line x1="51" y1="51" x2="58" y2="58" stroke="#2C1A00" stroke-width="1.5"/>
+          <line x1="58" y1="51" x2="51" y2="58" stroke="#2C1A00" stroke-width="1.5"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">지뢰찾기</div>
-      </div>
+      <div class="card-body"><div class="card-title">지뢰찾기</div><div class="card-desc">폭탄을 피해 칸을 열어가요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-
-    <a class="game-card c-baseball" href="./baseball/index.html">
-      <div class="mini-icon mini-baseball">
-        <div class="mb-label">숫자야구</div>
-        <div class="mb-row">
-          <div class="mb-d mb-s">3</div>
-          <div class="mb-d mb-b">7</div>
-          <div class="mb-d mb-o">5</div>
-        </div>
-        <div class="mb-label">1S 1B</div>
+    <a class="game-card" href="./baseball/index.html">
+      <div class="cat-pill">추리</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#1E2A4A"/>
+          <text x="32" y="13" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="7.5" fill="#6A88B8" letter-spacing="1">숫자야구</text>
+          <rect x="5" y="19" width="16" height="16" rx="4" fill="#4D96FF"/>
+          <text x="13" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">3</text>
+          <rect x="24" y="19" width="16" height="16" rx="4" fill="#6BCB77"/>
+          <text x="32" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">7</text>
+          <rect x="43" y="19" width="16" height="16" rx="4" fill="#3A4A6A"/>
+          <text x="51" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="#7A8AAA">5</text>
+          <rect x="5"  y="40" width="16" height="10" rx="3" fill="#2A3A5A"/>
+          <text x="13" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#4D96FF">1S</text>
+          <rect x="24" y="40" width="16" height="10" rx="3" fill="#2A3A5A"/>
+          <text x="32" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#6BCB77">1B</text>
+          <rect x="43" y="40" width="16" height="10" rx="3" fill="#2A3A5A"/>
+          <text x="51" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#5A6A8A">0O</text>
+          <circle cx="22" cy="59" r="3" fill="#4D96FF"/>
+          <circle cx="32" cy="59" r="3" fill="#4D96FF"/>
+          <circle cx="42" cy="59" r="3" fill="#2A3A5A"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">숫자 야구</div>
-      </div>
+      <div class="card-body"><div class="card-title">숫자 야구</div><div class="card-desc">숨겨진 숫자를 추리해요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-connect" href="./connectfour/index.html">
-      <div class="mini-icon mini-connect">
-        <div class="cc cc-e"></div><div class="cc cc-e"></div><div class="cc cc-e"></div><div class="cc cc-e"></div><div class="cc cc-e"></div>
-        <div class="cc cc-e"></div><div class="cc cc-r"></div><div class="cc cc-e"></div><div class="cc cc-e"></div><div class="cc cc-e"></div>
-        <div class="cc cc-y"></div><div class="cc cc-r"></div><div class="cc cc-r"></div><div class="cc cc-e"></div><div class="cc cc-e"></div>
-        <div class="cc cc-y"></div><div class="cc cc-y"></div><div class="cc cc-r"></div><div class="cc cc-r"></div><div class="cc cc-e"></div>
+    <a class="game-card" href="./connectfour/index.html">
+      <div class="cat-pill">전략</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#C4880A"/>
+          <circle cx="8"  cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="20" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="32" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="44" cy="14" r="5" fill="#FF5252"/>
+          <circle cx="56" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="8"  cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="20" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="32" cy="26" r="5" fill="#FF5252"/>
+          <circle cx="44" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="56" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="8"  cy="38" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="20" cy="38" r="5" fill="#FF5252"/>
+          <circle cx="32" cy="38" r="5" fill="#FFD93D"/>
+          <circle cx="44" cy="38" r="5" fill="#FFD93D"/>
+          <circle cx="56" cy="38" r="5" fill="rgba(0,0,0,0.3)"/>
+          <circle cx="8"  cy="50" r="5" fill="#FF5252"/>
+          <circle cx="20" cy="50" r="5" fill="#FFD93D"/>
+          <circle cx="32" cy="50" r="5" fill="#FFD93D"/>
+          <circle cx="44" cy="50" r="5" fill="#FFD93D"/>
+          <circle cx="56" cy="50" r="5" fill="#FFD93D"/>
+          <circle cx="42.5" cy="12.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+          <circle cx="30.5" cy="24.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+          <circle cx="18.5" cy="36.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+          <circle cx="6.5"  cy="48.5" r="1.5" fill="rgba(255,255,255,0.3)"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">사목</div>
-      </div>
+      <div class="card-body"><div class="card-title">사목</div><div class="card-desc">4개를 먼저 연결하면 승리!</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-
-    <a class="game-card c-wordle" href="./wordle/index.html">
-      <div class="mini-icon" style="background:#1e2a1e;border-radius:10px;box-shadow:0 3px 0 #d4c2a8;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:5px;width:64px;height:64px;">
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#b0a090;"></div>
-        <div style="border-radius:3px;background:#b0a090;"></div>
-        <div style="border-radius:3px;background:#ffd93d;"></div>
-        <div style="border-radius:3px;background:#b0a090;"></div>
-        <div style="border-radius:3px;background:#b0a090;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#b0a090;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#ffd93d;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
-        <div style="border-radius:3px;background:#6bcb77;"></div>
+    <a class="game-card" href="./wordle/index.html">
+      <div class="cat-pill">단어</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#1E2A1E"/>
+          <rect x="3"  y="9"  width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="15" y="9"  width="10" height="10" rx="2" fill="#4A3A30"/>
+          <rect x="27" y="9"  width="10" height="10" rx="2" fill="#C8A020"/>
+          <rect x="39" y="9"  width="10" height="10" rx="2" fill="#4A3A30"/>
+          <rect x="51" y="9"  width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="3"  y="21" width="10" height="10" rx="2" fill="#4A3A30"/>
+          <rect x="15" y="21" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="27" y="21" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="39" y="21" width="10" height="10" rx="2" fill="#4A3A30"/>
+          <rect x="51" y="21" width="10" height="10" rx="2" fill="#C8A020"/>
+          <rect x="3"  y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="15" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="27" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="39" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="51" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+          <rect x="3"  y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
+          <rect x="15" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
+          <rect x="27" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
+          <rect x="39" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
+          <rect x="51" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">워들</div>
-        <div class="card-desc">5글자 단어를 맞춰보세요</div>
-      </div>
+      <div class="card-body"><div class="card-title">워들</div><div class="card-desc">5글자 단어를 맞춰보세요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card c-nono" href="./nonogram/index.html">
-      <div class="mini-icon mini-nono">
-        <div class="nn nn-e"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-e"></div>
-        <div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div>
-        <div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-f"></div>
-        <div class="nn nn-e"></div><div class="nn nn-f"></div><div class="nn nn-f"></div><div class="nn nn-e"></div>
+    <a class="game-card" href="./nonogram/index.html">
+      <div class="cat-pill">퍼즐</div>
+      <div class="mini-icon">
+        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect width="64" height="64" fill="#F5EDE0"/>
+          <rect x="5"  y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="16" y="5"  width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="27" y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="38" y="5"  width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="49" y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="5"  y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="16" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="27" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="38" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="49" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="5"  y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="16" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="27" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="38" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="49" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="5"  y="38" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="16" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="27" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="38" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="49" y="38" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="5"  y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="16" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="27" y="49" width="10" height="10" rx="1.5" fill="#3D2810"/>
+          <rect x="38" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <rect x="49" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+          <line x1="5" y1="16" x2="59" y2="16" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="5" y1="27" x2="59" y2="27" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="5" y1="38" x2="59" y2="38" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="5" y1="49" x2="59" y2="49" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="16" y1="5" x2="16" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="27" y1="5" x2="27" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="38" y1="5" x2="38" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+          <line x1="49" y1="5" x2="49" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+        </svg>
       </div>
-      <div class="card-body">
-        <div class="card-title">노노그램</div>
-      </div>
+      <div class="card-body"><div class="card-title">노노그램</div><div class="card-desc">힌트로 그림을 완성해요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
   </div>
-
-  <div class="footer">더 많은 게임이 추가될 예정이에요 ✨</div>
-
+  <div class="footer">더 많은 게임이 추가될 예정이에요</div>
 </div>
-
 </body>
 </html>
