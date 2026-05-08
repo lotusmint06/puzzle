@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>소코반 📦</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff9f0;--board-bg:#f0e6d3;--floor:#fdf5e6;--wall:#b0996e;--target:#FF9F43;--box:#FF9F43;--box-done:#6BCB77;--text:#5a3e1b;--muted:#b0996e}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.09;animation:floatShape 8s ease-in-out infinite}
+.shape:nth-child(1){width:220px;height:220px;background:#FF9F43;top:-60px;left:-60px}
+.shape:nth-child(2){width:160px;height:160px;background:#4D96FF;top:55%;right:-40px;animation-delay:2s}
+.shape:nth-child(3){width:110px;height:110px;background:#6BCB77;bottom:-30px;left:30%;animation-delay:4s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+.wrapper{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px}
+.header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.title{font-size:clamp(28px,8vw,40px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,#FF9F43 0%,#FF5252 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,0.07))}
+.btn{background:#e8d8c0;color:#8b6914;border:none;border-radius:10px;padding:8px 13px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 3px 0 #d4c2a8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d4c2a8}
+.btn.blue{background:#4D96FF;color:white;box-shadow:0 3px 0 #2a70d4}
+.btn.blue:active{box-shadow:0 1px 0 #2a70d4}
+
+.diff-bar{width:100%;display:flex;gap:6px;background:var(--board-bg);border-radius:14px;padding:6px;box-shadow:0 3px 0 #d4c2a8}
+.diff-btn{flex:1;background:transparent;color:var(--muted);border:none;border-radius:10px;
+  padding:8px 6px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  transition:all .15s;-webkit-tap-highlight-color:transparent}
+.diff-btn.active{background:#FF9F43;color:white;box-shadow:0 2px 0 #c47820}
+
+.info-bar{width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:var(--board-bg);border-radius:14px;padding:9px 14px;box-shadow:0 3px 0 #d4c2a8}
+.info-left{display:flex;flex-direction:column}
+.status-lbl{font-size:14px;font-weight:800;color:var(--text)}
+.sub-lbl{font-size:11px;font-weight:700;color:var(--muted)}
+
+.board-wrap{width:100%;background:var(--board-bg);border-radius:18px;padding:14px;
+  box-shadow:0 6px 0 #d4c2a8,0 12px 30px rgba(0,0,0,.08);
+  display:flex;align-items:center;justify-content:center;
+  touch-action:none;user-select:none;-webkit-user-select:none;min-height:340px;position:relative}
+#board{display:grid;gap:2px}
+.cell{width:42px;height:42px;display:flex;align-items:center;justify-content:center;position:relative;border-radius:4px}
+.cell.wall{background:var(--wall);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),inset 0 2px 0 rgba(255,255,255,.15)}
+.cell.floor{background:var(--floor)}
+.cell.target::before{content:"";position:absolute;width:38%;height:38%;border-radius:50%;
+  border:3px dashed var(--target);box-sizing:border-box}
+.box-spr{width:78%;height:78%;border-radius:6px;background:var(--box);
+  box-shadow:0 3px 0 #c47820,inset 0 -3px 0 rgba(0,0,0,.18),inset 0 2px 0 rgba(255,255,255,.25);
+  position:relative}
+.box-spr.done{background:var(--box-done);box-shadow:0 3px 0 #3a9a45,inset 0 -3px 0 rgba(0,0,0,.18),inset 0 2px 0 rgba(255,255,255,.25)}
+.box-spr::after{content:"";position:absolute;inset:18%;border:2px solid rgba(0,0,0,.18);border-radius:3px}
+.player{width:78%;height:78%;border-radius:50%;background:#4D96FF;
+  box-shadow:0 3px 0 #2a70d4,inset 0 -3px 0 rgba(0,0,0,.18),inset 0 2px 0 rgba(255,255,255,.25);
+  position:relative;z-index:2}
+.player::before,.player::after{content:"";position:absolute;background:white;border-radius:50%}
+.player::before{width:18%;height:18%;top:32%;left:24%}
+.player::after{width:18%;height:18%;top:32%;right:24%}
+
+/* D-pad overlay */
+.dpad{position:absolute;inset:14px;display:grid;
+  grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;
+  pointer-events:none;z-index:5;border-radius:12px}
+.dpad-btn{display:flex;align-items:center;justify-content:center;
+  font-size:clamp(20px,5.5vw,30px);font-weight:900;color:rgba(90,62,27,.55);
+  background:transparent;border:none;cursor:pointer;pointer-events:all;
+  -webkit-tap-highlight-color:transparent;transition:background .1s,color .1s;border-radius:10px}
+.dpad-btn:active{background:rgba(90,62,27,.12);color:rgba(90,62,27,.95)}
+.dpad-up   {grid-column:2;grid-row:1}
+.dpad-left {grid-column:1;grid-row:2}
+.dpad-right{grid-column:3;grid-row:2}
+.dpad-down {grid-column:2;grid-row:3}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(240,225,200,.93);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+.ov-emoji{font-size:64px}
+.ov-title{font-size:30px;font-weight:900;color:var(--text)}
+.ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
+@keyframes bounceIn{0%{transform:scale(.7)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.overlay.show .ov-emoji{animation:bounceIn .4s ease}
+
+@media (max-width:380px){.cell{width:36px;height:36px}}
+</style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+<div class="wrapper">
+  <div class="header">
+    <div class="title">소코반</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="undo()">↶</button>
+      <button class="btn" onclick="resetPuzzle()">↺</button>
+      <a href="../index.html" class="btn">🏠</a>
+    </div>
+  </div>
+
+  <div class="diff-bar">
+    <button class="diff-btn active" data-diff="easy" onclick="setDifficulty('easy')">쉬움</button>
+    <button class="diff-btn" data-diff="normal" onclick="setDifficulty('normal')">보통</button>
+    <button class="diff-btn" data-diff="hard" onclick="setDifficulty('hard')">어려움</button>
+  </div>
+
+  <div class="info-bar">
+    <div class="info-left">
+      <div class="status-lbl" id="statusLbl">상자를 동그라미로 옮기세요</div>
+      <div class="sub-lbl" id="subLbl">퍼즐 #1</div>
+    </div>
+    <button class="btn blue" onclick="newPuzzle()">↻ 새 퍼즐</button>
+  </div>
+
+  <div class="board-wrap">
+    <div id="board"></div>
+    <div class="dpad">
+      <button class="dpad-btn dpad-up"    onclick="move(-1,0)">▲</button>
+      <button class="dpad-btn dpad-left"  onclick="move(0,-1)">◀</button>
+      <button class="dpad-btn dpad-right" onclick="move(0,1)">▶</button>
+      <button class="dpad-btn dpad-down"  onclick="move(1,0)">▼</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-emoji">🎉</div>
+  <div class="ov-title">완성!</div>
+  <div class="ov-sub" id="ovSub"></div>
+  <button class="btn blue" onclick="newPuzzle()" style="margin-top:4px">↻ 새 퍼즐</button>
+  <button class="btn" onclick="resetPuzzle()">다시 풀기</button>
+</div>
+
+<script>
+const DIFFICULTIES = {
+  easy:   { name:'쉬움',   size:5, boxes:1, pulls:7,  walls:0 },
+  normal: { name:'보통',   size:6, boxes:2, pulls:14, walls:1 },
+  hard:   { name:'어려움', size:7, boxes:3, pulls:22, walls:2 },
+};
+
+let currentDiff = 'easy';
+let puzzleNum = 0;
+let H = 0, W = 0;
+let walls;     // 2d bool
+let targets;   // 2d bool
+let boxes;     // 2d bool
+let player;    // {r,c}
+let history;   // stack of state snapshots
+let initialState; // for reset
+
+const boardEl = document.getElementById('board');
+const overlayEl = document.getElementById('overlay');
+
+// ── Random generation (reverse-pull algorithm) ──
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function isAllConnected(wall, N) {
+  let start = null;
+  for (let r = 1; r < N-1 && !start; r++)
+    for (let c = 1; c < N-1 && !start; c++)
+      if (!wall[r][c]) start = [r, c];
+  if (!start) return false;
+  const visited = new Set([start.join(',')]);
+  const stack = [start];
+  while (stack.length) {
+    const [r, c] = stack.pop();
+    for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr >= N || nc < 0 || nc >= N || wall[nr][nc]) continue;
+      const k = nr + ',' + nc;
+      if (visited.has(k)) continue;
+      visited.add(k);
+      stack.push([nr, nc]);
+    }
+  }
+  for (let r = 1; r < N-1; r++)
+    for (let c = 1; c < N-1; c++)
+      if (!wall[r][c] && !visited.has(r + ',' + c)) return false;
+  return true;
+}
+
+function tryGenerate(diff) {
+  const cfg = DIFFICULTIES[diff];
+  const N = cfg.size;
+
+  // Init walls (border)
+  const wall = Array.from({length:N}, (_, r) =>
+    Array.from({length:N}, (_, c) =>
+      r === 0 || r === N-1 || c === 0 || c === N-1
+    )
+  );
+
+  // Add random internal walls (with connectivity check)
+  let placed = 0, tries = 0;
+  while (placed < cfg.walls && tries++ < 30) {
+    const r = 1 + Math.floor(Math.random() * (N-2));
+    const c = 1 + Math.floor(Math.random() * (N-2));
+    if (wall[r][c]) continue;
+    wall[r][c] = true;
+    if (!isAllConnected(wall, N)) wall[r][c] = false;
+    else placed++;
+  }
+
+  // Floor cells
+  const floors = [];
+  for (let r = 1; r < N-1; r++)
+    for (let c = 1; c < N-1; c++)
+      if (!wall[r][c]) floors.push([r, c]);
+  if (floors.length < cfg.boxes + 2) return null;
+
+  // Targets — avoid corners (boxes can get stuck there)
+  const isCorner = (r, c) => {
+    let openSides = 0;
+    for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]])
+      if (!wall[r+dr][c+dc]) openSides++;
+    return openSides < 2;
+  };
+  const goodSpots = floors.filter(([r,c]) => !isCorner(r, c));
+  if (goodSpots.length < cfg.boxes) return null;
+
+  shuffle(goodSpots);
+  const tgts = goodSpots.slice(0, cfg.boxes).map(t => [...t]);
+  const bxs = tgts.map(t => [...t]);
+
+  // Player on remaining floor
+  const remaining = floors.filter(f => !bxs.some(b => b[0]===f[0] && b[1]===f[1]));
+  if (!remaining.length) return null;
+  let pl = remaining[Math.floor(Math.random() * remaining.length)];
+
+  // Pulls + walks
+  const dirs = [[-1,0],[1,0],[0,-1],[0,1]];
+  const hasBox = (r, c) => bxs.some(b => b[0]===r && b[1]===c);
+
+  for (let i = 0; i < cfg.pulls; i++) {
+    const sd = shuffle([...dirs]);
+    let acted = false;
+
+    // Prefer pull when possible
+    for (const [dr, dc] of sd) {
+      const nr = pl[0] + dr, nc = pl[1] + dc;
+      if (nr<0||nr>=N||nc<0||nc>=N||wall[nr][nc]||hasBox(nr,nc)) continue;
+      const br = pl[0] - dr, bc = pl[1] - dc;
+      const bi = bxs.findIndex(b => b[0]===br && b[1]===bc);
+      if (bi >= 0 && Math.random() < 0.75) {
+        bxs[bi] = [pl[0], pl[1]];
+        pl = [nr, nc];
+        acted = true;
+        break;
+      }
+    }
+    // Else just walk
+    if (!acted) {
+      for (const [dr, dc] of sd) {
+        const nr = pl[0] + dr, nc = pl[1] + dc;
+        if (nr<0||nr>=N||nc<0||nc>=N||wall[nr][nc]||hasBox(nr,nc)) continue;
+        pl = [nr, nc];
+        break;
+      }
+    }
+  }
+
+  // Validate: no box should remain on its target (puzzle would be partly solved)
+  const onTarget = bxs.filter(b => tgts.some(t => t[0]===b[0] && t[1]===b[1])).length;
+  if (onTarget > 0) return null;
+
+  return { N, wall, targets: tgts, boxes: bxs, player: pl };
+}
+
+function generatePuzzle(diff) {
+  for (let i = 0; i < 100; i++) {
+    const r = tryGenerate(diff);
+    if (r) return r;
+  }
+  return null;
+}
+
+// ── Init / reset ──
+function applyState(state) {
+  H = W = state.N;
+  walls = state.wall.map(row => row.slice());
+  targets = Array.from({length:H}, () => Array(W).fill(false));
+  for (const [r, c] of state.targets) targets[r][c] = true;
+  boxes = Array.from({length:H}, () => Array(W).fill(false));
+  for (const [r, c] of state.boxes) boxes[r][c] = true;
+  player = { r: state.player[0], c: state.player[1] };
+  history = [];
+}
+
+function newPuzzle() {
+  const result = generatePuzzle(currentDiff);
+  if (!result) return;
+  initialState = {
+    N: result.N,
+    wall: result.wall.map(row => row.slice()),
+    targets: result.targets.map(t => [...t]),
+    boxes: result.boxes.map(b => [...b]),
+    player: [...result.player],
+  };
+  applyState(initialState);
+  puzzleNum++;
+  overlayEl.classList.remove('show');
+  document.getElementById('subLbl').textContent =
+    `${DIFFICULTIES[currentDiff].name} · 퍼즐 #${puzzleNum}`;
+  buildBoard();
+  render();
+  updateStatus();
+}
+
+function resetPuzzle() {
+  if (!initialState) return;
+  applyState(initialState);
+  overlayEl.classList.remove('show');
+  render();
+  updateStatus();
+}
+
+function setDifficulty(diff) {
+  if (diff === currentDiff) return;
+  currentDiff = diff;
+  document.querySelectorAll('.diff-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.diff === diff);
+  });
+  newPuzzle();
+}
+
+// ── Rendering ──
+function buildBoard() {
+  boardEl.style.gridTemplateColumns = `repeat(${W}, auto)`;
+  boardEl.innerHTML = '';
+  for (let r = 0; r < H; r++) {
+    for (let c = 0; c < W; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r; cell.dataset.c = c;
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+function cellEl(r, c) { return boardEl.children[r * W + c]; }
+
+function render() {
+  for (let r = 0; r < H; r++) {
+    for (let c = 0; c < W; c++) {
+      const cell = cellEl(r, c);
+      cell.innerHTML = '';
+      cell.className = 'cell ' + (walls[r][c] ? 'wall' : 'floor') + (targets[r][c] ? ' target' : '');
+      if (boxes[r][c]) {
+        const b = document.createElement('div');
+        b.className = 'box-spr' + (targets[r][c] ? ' done' : '');
+        cell.appendChild(b);
+      }
+      if (player.r === r && player.c === c) {
+        const p = document.createElement('div');
+        p.className = 'player';
+        cell.appendChild(p);
+      }
+    }
+  }
+}
+
+function updateStatus() {
+  let total = 0, done = 0;
+  for (let r = 0; r < H; r++)
+    for (let c = 0; c < W; c++) {
+      if (targets[r][c]) total++;
+      if (targets[r][c] && boxes[r][c]) done++;
+    }
+  document.getElementById('statusLbl').textContent =
+    done === total ? '모두 정리! 🎉' : `${done}/${total} 정리됨`;
+  return done === total;
+}
+
+// ── Movement ──
+function inBounds(r, c) { return r >= 0 && r < H && c >= 0 && c < W; }
+
+function snapshot() {
+  return {
+    boxes: boxes.map(row => row.slice()),
+    player: {r: player.r, c: player.c},
+  };
+}
+
+function move(dr, dc) {
+  if (overlayEl.classList.contains('show')) return;
+  const nr = player.r + dr, nc = player.c + dc;
+  if (!inBounds(nr, nc) || walls[nr][nc]) return;
+
+  if (boxes[nr][nc]) {
+    const br = nr + dr, bc = nc + dc;
+    if (!inBounds(br, bc) || walls[br][bc] || boxes[br][bc]) return;
+    history.push(snapshot());
+    boxes[nr][nc] = false;
+    boxes[br][bc] = true;
+    player = {r: nr, c: nc};
+  } else {
+    history.push(snapshot());
+    player = {r: nr, c: nc};
+  }
+  render();
+  if (updateStatus()) {
+    setTimeout(() => {
+      document.getElementById('ovSub').textContent =
+        `${DIFFICULTIES[currentDiff].name} · 퍼즐 #${puzzleNum}`;
+      overlayEl.classList.add('show');
+    }, 250);
+  }
+}
+
+function undo() {
+  if (!history.length) return;
+  const s = history.pop();
+  boxes = s.boxes;
+  player = s.player;
+  render();
+  updateStatus();
+}
+
+// ── Input ──
+document.addEventListener('keydown', e => {
+  const map = {'ArrowUp':[-1,0],'ArrowDown':[1,0],'ArrowLeft':[0,-1],'ArrowRight':[0,1],
+               'w':[-1,0],'s':[1,0],'a':[0,-1],'d':[0,1]};
+  const m = map[e.key];
+  if (m) { e.preventDefault(); move(m[0], m[1]); }
+  if (e.key === 'z' || e.key === 'Z') undo();
+});
+
+newPuzzle();
+</script>
+</body>
+</html>

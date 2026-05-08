@@ -7,7 +7,7 @@
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f2e;--text:#fff;--muted:#8888cc}
+:root{--bg:#fff9f0;--board-bg:#f0e6d3;--text:#5a3e1b;--muted:#b0996e}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:'Nunito',sans-serif;background:var(--bg);
@@ -15,43 +15,52 @@ body{
   padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
   overflow:hidden;
 }
-.wrapper{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:420px}
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.09;animation:floatShape 8s ease-in-out infinite}
+.shape:nth-child(1){width:220px;height:220px;background:#FF5252;top:-60px;left:-60px}
+.shape:nth-child(2){width:160px;height:160px;background:#FFD93D;top:55%;right:-40px;animation-delay:2s}
+.shape:nth-child(3){width:110px;height:110px;background:#6BCB77;bottom:-30px;left:30%;animation-delay:4s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+.wrapper{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:420px}
 .header{display:flex;align-items:center;justify-content:space-between;width:100%}
 .title{font-size:clamp(26px,7vw,36px);font-weight:900;letter-spacing:-1px;
   background:linear-gradient(135deg,#FF5252 0%,#FFD93D 50%,#6BCB77 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.btn{background:#ffffff18;color:white;border:none;border-radius:10px;padding:8px 13px;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,0.07))}
+.btn{background:#e8d8c0;color:#8b6914;border:none;border-radius:10px;padding:8px 13px;
   font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
-  text-decoration:none;display:inline-flex;align-items:center;gap:4px;
-  -webkit-tap-highlight-color:transparent;transition:background .15s}
-.btn:active{background:#ffffff30}
-.btn.home{background:#ffffff10}
+  box-shadow:0 3px 0 #d4c2a8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;transition:transform .1s,box-shadow .1s}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d4c2a8}
 .score-row{display:flex;gap:8px;width:100%}
-.score-box{flex:1;background:#ffffff10;border-radius:14px;padding:8px 12px;text-align:center}
+.score-box{flex:1;background:var(--board-bg);border-radius:14px;padding:8px 12px;text-align:center;box-shadow:0 3px 0 #d4c2a8}
 .score-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
-.score-val{font-size:22px;font-weight:900;color:white}
-canvas{border-radius:16px;display:block;touch-action:none;cursor:crosshair}
+.score-val{font-size:22px;font-weight:900;color:var(--text)}
+canvas{border-radius:16px;display:block;touch-action:none;cursor:crosshair;background:var(--board-bg);box-shadow:0 6px 0 #d4c2a8}
 .next-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--muted)}
+#nextCanvas{background:transparent;box-shadow:none;border-radius:0}
 
 .overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:14px;
-  background:rgba(10,10,40,.93);backdrop-filter:blur(6px);
+  background:rgba(240,225,200,.93);backdrop-filter:blur(6px);
   opacity:0;pointer-events:none;transition:opacity .3s}
 .overlay.show{opacity:1;pointer-events:all}
 .ov-emoji{font-size:68px}
-.ov-title{font-size:28px;font-weight:900;color:white}
+.ov-title{font-size:28px;font-weight:900;color:var(--text)}
 .ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
 @keyframes bounceIn{0%{transform:scale(.6)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
 .overlay.show .ov-emoji{animation:bounceIn .4s ease}
 </style>
 </head>
 <body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
 <div class="wrapper">
   <div class="header">
     <div class="title">버블 팝</div>
     <div style="display:flex;gap:6px">
       <button class="btn" onclick="newGame()">새 게임</button>
-      <a href="../index.html" class="btn home">🏠</a>
+      <a href="../index.html" class="btn">🏠</a>
     </div>
   </div>
 
@@ -79,7 +88,7 @@ canvas{border-radius:16px;display:block;touch-action:none;cursor:crosshair}
   <div class="ov-title" id="ovTitle"></div>
   <div class="ov-sub"   id="ovSub"></div>
   <button class="btn" onclick="newGame()" style="margin-top:8px;font-size:15px;padding:12px 24px">새 게임</button>
-  <a href="../index.html" class="btn home">🏠 홈으로</a>
+  <a href="../index.html" class="btn">🏠 홈으로</a>
 </div>
 
 <script>
@@ -139,6 +148,7 @@ let shooterColor = 0;
 let nextColor    = 0;
 let shooterAngle = -Math.PI / 2; // pointing up
 let shooting     = false;
+let popping      = false;
 
 // Bullet
 let bx, by, bdx, bdy;
@@ -148,6 +158,45 @@ const SPEED = 10;
 let score = 0;
 let best  = +localStorage.getItem('bubble-best') || 0;
 let gameOver = false;
+
+// ── Pop animation ──
+let poppingBubbles = []; // {type, x, y, colorIdx, startTime, vx?, vy?}
+const POP_DURATION = 380; // ms
+
+function addPopAnimation(row, col, colorIdx) {
+  const x = bubbleX(row, col), y = bubbleY(row);
+  const t0 = performance.now();
+  poppingBubbles.push({ type:'main', x, y, colorIdx, startTime: t0 });
+  for (let i = 0; i < 5; i++) {
+    const angle = (Math.PI * 2 * i / 5) + (Math.random() - 0.5) * 0.6;
+    const speed = 0.18 + Math.random() * 0.12;
+    poppingBubbles.push({
+      type:'particle', x, y, colorIdx, startTime: t0,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+    });
+  }
+}
+
+function drawPoppingBubbles() {
+  if (!poppingBubbles.length) return;
+  const now = performance.now();
+  poppingBubbles = poppingBubbles.filter(p => now - p.startTime < POP_DURATION);
+  for (const p of poppingBubbles) {
+    const elapsed = now - p.startTime;
+    const t = Math.min(1, elapsed / POP_DURATION);
+    const alpha = Math.max(0, 1 - t * 1.15);
+    if (p.type === 'main') {
+      const scale = 1 + t * 0.55;
+      drawBubble(ctx, p.x, p.y, R * scale, p.colorIdx, alpha);
+    } else {
+      const px = p.x + p.vx * elapsed;
+      const py = p.y + p.vy * elapsed + elapsed * elapsed * 0.0004;
+      const rr = R * 0.34 * (1 - t * 0.4);
+      drawBubble(ctx, px, py, rr, p.colorIdx, alpha);
+    }
+  }
+}
 
 function updateScoreUI() {
   document.getElementById('scoreEl').textContent = score;
@@ -196,7 +245,7 @@ function drawShooter() {
   const dx = Math.cos(shooterAngle), dy = Math.sin(shooterAngle);
   ctx.save();
   ctx.setLineDash([8, 8]);
-  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.strokeStyle = 'rgba(90,62,27,0.25)';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(cx, cy);
@@ -218,22 +267,15 @@ function drawNextBubble() {
 function renderAll() {
   ctx.clearRect(0, 0, W, H);
 
-  // Background stars
-  ctx.fillStyle = '#ffffff08';
-  for (let i = 0; i < 40; i++) {
-    ctx.beginPath();
-    ctx.arc(starData[i*2]*W, starData[i*2+1]*H, 1.2, 0, Math.PI*2);
-    ctx.fill();
-  }
-
   drawGrid();
+  drawPoppingBubbles();
   drawBullet();
-  if (!shooting && !gameOver) drawShooter();
+  if (!shooting && !popping && !gameOver) drawShooter();
 
   // Danger line
   const dangerY = H - R * 4;
   ctx.save();
-  ctx.strokeStyle = 'rgba(255,80,80,0.3)';
+  ctx.strokeStyle = 'rgba(255,82,82,0.5)';
   ctx.lineWidth = 1.5;
   ctx.setLineDash([6,6]);
   ctx.beginPath();
@@ -242,9 +284,6 @@ function renderAll() {
   ctx.stroke();
   ctx.restore();
 }
-
-// Pre-compute star positions
-const starData = Array.from({length:80}, () => Math.random());
 
 // ── Aim & Shoot ──
 function setAngleFromPoint(x, y) {
@@ -257,14 +296,14 @@ function setAngleFromPoint(x, y) {
 }
 
 canvas.addEventListener('pointermove', e => {
-  if (shooting || gameOver) return;
+  if (shooting || popping || gameOver) return;
   const rect = canvas.getBoundingClientRect();
   setAngleFromPoint(e.clientX - rect.left, e.clientY - rect.top);
   renderAll();
 });
 
 canvas.addEventListener('click', e => {
-  if (shooting || gameOver) return;
+  if (shooting || popping || gameOver) return;
   const rect = canvas.getBoundingClientRect();
   setAngleFromPoint(e.clientX - rect.left, e.clientY - rect.top);
   shoot();
@@ -272,7 +311,7 @@ canvas.addEventListener('click', e => {
 
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
-  if (shooting || gameOver) return;
+  if (shooting || popping || gameOver) return;
   const rect = canvas.getBoundingClientRect();
   const t = e.changedTouches[0];
   setAngleFromPoint(t.clientX - rect.left, t.clientY - rect.top);
@@ -371,6 +410,27 @@ function snapToGrid() {
     removeFloating();
   }
 
+  // Wait for any pop animation before continuing turn
+  if (poppingBubbles.length > 0) {
+    shooting = false;   // bullet is gone (already in grid or popped)
+    popping  = true;    // block input + shooter draw until animation done
+    animatePopping();
+  } else {
+    finishTurn();
+  }
+}
+
+function animatePopping() {
+  renderAll();
+  if (poppingBubbles.length === 0) {
+    popping = false;
+    finishTurn();
+    return;
+  }
+  requestAnimationFrame(animatePopping);
+}
+
+function finishTurn() {
   // Check lose: any bubble below danger line
   checkLose();
   if (gameOver) { renderAll(); return; }
@@ -410,7 +470,10 @@ function popGroup(startRow, startCol) {
   }
 
   if (toRemove.length >= 3) {
-    for (const [r,c] of toRemove) grid[r][c] = null;
+    for (const [r,c] of toRemove) {
+      addPopAnimation(r, c, grid[r][c]);
+      grid[r][c] = null;
+    }
     return toRemove.length;
   }
   return 0;
@@ -458,6 +521,7 @@ function removeFloating() {
     if (!grid[r]) continue;
     for (let c = 0; c < grid[r].length; c++) {
       if (grid[r][c] !== null && !connected.has(r+'_'+c)) {
+        addPopAnimation(r, c, grid[r][c]);
         grid[r][c] = null;
         score += 5;
       }
@@ -493,7 +557,8 @@ function showResult(win) {
 
 // ── New game ──
 function newGame() {
-  score = 0; gameOver = false; shooting = false;
+  score = 0; gameOver = false; shooting = false; popping = false;
+  poppingBubbles = [];
   shooterAngle = -Math.PI / 2;
   shooterColor = Math.floor(Math.random() * NUM_COLORS);
   nextColor    = Math.floor(Math.random() * NUM_COLORS);
