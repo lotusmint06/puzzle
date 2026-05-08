@@ -1,0 +1,37 @@
+/* Open Design Puzzle Hub — shared design tokens.
+   Imported by every game's index.html so the chrome stays unified across the hub.
+   Game-functional colors (tile palettes, player discs, letter states, grass, etc.)
+   stay local to each game — only chrome is unified here. */
+
+:root {
+  --bg:        #FFF8F0;
+  --board-bg:  #F0E6D3;
+  --surface:   #FFFFFF;
+  --fg:        #2C1A00;
+  --muted:     #9E8060;
+  --border:    #E0CCAF;
+  --shadow:    #CCBA9C;
+  --orange:    #FF6B35;
+  --orange-dk: #D44E1A;
+  --amber:     #FFB830;
+  --amber-dk:  #C78A00;
+  --cell-bg:   #E8D8C0;
+}
+
+/* Home button — top-left "back to hub" affordance. White surface + border to
+   match the hub's card style. */
+.home-btn {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  background: var(--surface); border: 1.5px solid var(--border);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 900; text-decoration: none;
+  box-shadow: 0 3px 0 var(--shadow); color: var(--fg); cursor: pointer; line-height: 1;
+  transition: transform .12s ease, box-shadow .12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.home-btn:hover  { transform: translateY(-2px); box-shadow: 0 5px 0 var(--shadow); }
+.home-btn:active { transform: translateY(2px);  box-shadow: 0 1px 0 var(--shadow); }
+
+/* Title accent — wrap first character in <em> to color it with the hub orange. */
+.hub-title    { color: var(--fg); font-weight: 900; letter-spacing: -1px; line-height: 1; }
+.hub-title em { font-style: normal; color: var(--orange); }

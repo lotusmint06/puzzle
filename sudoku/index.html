@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>스도쿠 🔢</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="../assets/tokens.css">
 <script defer src="../assets/sfx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #fff9f0; --board-bg: #f0e6d3; --cell-bg: #faf4eb; }
+  :root { --cell-bg: #faf4eb; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -23,9 +24,9 @@
 
   .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
   .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
-  .shape:nth-child(1) { width: 200px; height: 200px; background: #ffd93d; top: -60px; left: -60px; }
-  .shape:nth-child(2) { width: 150px; height: 150px; background: #4d96ff; top: 60%; right: -40px; animation-delay: 2s; }
-  .shape:nth-child(3) { width: 100px; height: 100px; background: #6bcb77; bottom: -30px; left: 30%; animation-delay: 4s; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: var(--orange); top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: var(--amber); top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: var(--orange); bottom: -30px; left: 30%; animation-delay: 4s; }
   @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
 
   .game-wrapper {
@@ -39,17 +40,16 @@
 
   .title {
     font-size: clamp(28px, 8vw, 42px); font-weight: 900;
-    letter-spacing: -1px; line-height: 1;
-    background: linear-gradient(135deg, #ffd93d, #4d96ff);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -1px; line-height: 1; color: var(--fg);
   }
+  .title em { font-style: normal; color: var(--orange); }
 
   .stats { display: flex; gap: 8px; }
   .stat-box {
-    background: #ffd93d; border-radius: 12px; padding: 6px 12px;
-    text-align: center; color: #7a5c00; box-shadow: 0 3px 0 #d4aa00; min-width: 60px;
+    background: var(--orange); border-radius: 12px; padding: 6px 12px;
+    text-align: center; color: white; box-shadow: 0 3px 0 var(--orange-dk); min-width: 60px;
   }
-  .stat-box.timer  { background: #4d96ff; box-shadow: 0 3px 0 #2a70d4; color: white; }
+  .stat-box.timer  { background: var(--amber); box-shadow: 0 3px 0 var(--amber-dk); color: #7a5c00; }
   .stat-box.errors { background: #ff6b6b; box-shadow: 0 3px 0 #c43c3c; color: white; }
   .stat-label { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; white-space: nowrap; }
   .stat-value { font-size: 18px; font-weight: 900; line-height: 1.2; }
@@ -57,25 +57,27 @@
   .controls { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; }
   .diff-row { display: flex; gap: 5px; }
   .diff-btn {
-    background: #e8d8c0; color: #8b6914; border: none; border-radius: 8px;
+    background: var(--surface); color: var(--muted);
+    border: 1.5px solid var(--border); border-radius: 8px;
     padding: 6px 12px; font-family: 'Nunito', sans-serif; font-size: 12px;
     font-weight: 800; cursor: pointer; transition: background 0.15s; white-space: nowrap;
   }
-  .diff-btn.active { background: #ffd93d; color: #7a5c00; box-shadow: 0 3px 0 #d4aa00; }
-  .size-btn { background: #e8d8c0; color: #8b6914; border: none; border-radius: 8px;
+  .diff-btn.active { background: var(--orange); color: white; border-color: var(--orange); box-shadow: 0 3px 0 var(--orange-dk); }
+  .size-btn { background: var(--surface); color: var(--muted);
+    border: 1.5px solid var(--border); border-radius: 8px;
     padding: 6px 12px; font-family: 'Nunito', sans-serif; font-size: 12px;
     font-weight: 800; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
-  .size-btn.active { background: #6bcb77; color: white; box-shadow: 0 3px 0 #3a9a45; }
+  .size-btn.active { background: var(--orange); color: white; border-color: var(--orange); box-shadow: 0 3px 0 var(--orange-dk); }
 
   .btn {
-    background: #4d96ff; color: white; border: none; border-radius: 10px;
+    background: var(--orange); color: white; border: none; border-radius: 10px;
     padding: 8px 16px; font-family: 'Nunito', sans-serif; font-size: 13px;
-    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #2a70d4;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 var(--orange-dk);
     transition: transform 0.1s; white-space: nowrap; text-decoration: none;
     display: inline-flex; align-items: center;
   }
   .btn:active { transform: translateY(2px); }
-  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+  .btn.muted { background: var(--surface); border: 1.5px solid var(--border); box-shadow: 0 3px 0 var(--shadow); color: var(--fg); }
 
   /* Sudoku Board */
   .board-outer {
@@ -172,7 +174,8 @@
 
 <div class="game-wrapper">
   <div class="header">
-    <div class="title">스도쿠</div>
+    <a href="../index.html" class="home-btn" aria-label="홈으로">←</a>
+    <div class="title"><em>스</em>도쿠</div>
     <div class="stats">
       <div class="stat-box errors">
         <div class="stat-label">❌ 실수</div>
@@ -193,7 +196,6 @@
     </div>
     <div style="display:flex;gap:6px">
       <button class="btn" id="newBtn">새 게임</button>
-      <a href="../index.html" class="btn muted">🏠</a>
     </div>
   </div>
 

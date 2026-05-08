@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Puzzle Drop 🟥</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="../assets/tokens.css">
 <script defer src="../assets/sfx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #fff9f0; --board-bg: #f0e6d3; --cell-bg: #e8d8c0; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -24,9 +24,9 @@
 
   .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
   .shape { position: absolute; border-radius: 50%; opacity: 0.09; animation: floatShape 8s ease-in-out infinite; }
-  .shape:nth-child(1) { width: 200px; height: 200px; background: #ff6b6b; top: -60px; left: -60px; }
-  .shape:nth-child(2) { width: 150px; height: 150px; background: #4d96ff; top: 60%; right: -40px; animation-delay: 2s; }
-  .shape:nth-child(3) { width: 100px; height: 100px; background: #ffd93d; bottom: -30px; left: 30%; animation-delay: 4s; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: var(--orange); top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: var(--amber); top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: var(--orange); bottom: -30px; left: 30%; animation-delay: 4s; }
   @keyframes floatShape { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-20px); } }
 
   .game-wrapper {
@@ -40,28 +40,27 @@
 
   .title {
     font-size: clamp(22px, 6vw, 34px); font-weight: 900;
-    letter-spacing: -1px; line-height: 1;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #4d96ff 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -1px; line-height: 1; color: var(--fg);
   }
+  .title em { font-style: normal; color: var(--orange); }
 
   .scores { display: flex; gap: 8px; }
   .score-box {
-    background: #ff6b6b; border-radius: 12px; padding: 6px 14px;
-    text-align: center; color: white; box-shadow: 0 3px 0 #c43c3c; min-width: 68px;
+    background: var(--orange); border-radius: 12px; padding: 6px 14px;
+    text-align: center; color: white; box-shadow: 0 3px 0 var(--orange-dk); min-width: 68px;
   }
-  .score-box.best { background: #ffd93d; box-shadow: 0 3px 0 #d4aa00; color: #7a5c00; }
+  .score-box.best { background: var(--amber); box-shadow: 0 3px 0 var(--amber-dk); color: #7a5c00; }
   .score-label { font-size: 9px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; white-space: nowrap; }
   .score-value { font-size: 20px; font-weight: 900; line-height: 1.2; }
 
   .controls { display: flex; align-items: center; justify-content: flex-end; width: 100%; gap: 6px; }
   .btn {
-    background: #4d96ff; color: white; border: none; border-radius: 10px;
+    background: var(--orange); color: white; border: none; border-radius: 10px;
     padding: 8px 16px; font-family: 'Nunito', sans-serif; font-size: 13px;
-    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #2a70d4;
+    font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 var(--orange-dk);
     white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center;
   }
-  .btn.muted { background: #e8d8c0; box-shadow: 0 3px 0 #d4c2a8; color: #8b6914; }
+  .btn.muted { background: var(--surface); border: 1.5px solid var(--border); box-shadow: 0 3px 0 var(--shadow); color: var(--fg); }
 
   /* Board */
   .board-outer {
@@ -173,7 +172,8 @@
 
 <div class="game-wrapper">
   <div class="header">
-    <div class="title">Block Blast</div>
+    <a href="../index.html" class="home-btn" aria-label="홈으로">←</a>
+    <div class="title"><em>P</em>uzzle Drop</div>
     <div class="scores">
       <div class="score-box">
         <div class="score-label">점수</div>
@@ -188,7 +188,6 @@
 
   <div class="controls">
     <button class="btn" id="newBtn">새 게임</button>
-    <a href="../index.html" class="btn muted">🏠</a>
   </div>
 
   <div class="board-outer">

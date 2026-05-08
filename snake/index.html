@@ -5,14 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>스네이크 🐍</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="../assets/tokens.css">
 <script defer src="../assets/sfx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #fff9f0;
-    --board-bg: #f0e6d3;
-    --cell-bg: #e8d8c0;
-  }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -30,10 +26,10 @@
 
   .bg-shapes { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
   .shape { position: absolute; border-radius: 50%; opacity: 0.10; animation: floatShape 8s ease-in-out infinite; }
-  .shape:nth-child(1) { width: 200px; height: 200px; background: #6bcb77; top: -60px; left: -60px; }
-  .shape:nth-child(2) { width: 150px; height: 150px; background: #4d96ff; top: 60%; right: -40px; animation-delay: 2s; }
-  .shape:nth-child(3) { width: 100px; height: 100px; background: #ff6b6b; bottom: -30px; left: 30%; animation-delay: 4s; }
-  .shape:nth-child(4) { width: 80px; height: 80px;  background: #ffd93d; top: 40%; left: -20px; animation-delay: 1s; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: var(--orange); top: -60px; left: -60px; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: var(--amber); top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: var(--orange); bottom: -30px; left: 30%; animation-delay: 4s; }
+  .shape:nth-child(4) { width: 80px; height: 80px;  background: var(--amber); top: 40%; left: -20px; animation-delay: 1s; }
   @keyframes floatShape { 0%,100%{ transform: translateY(0) scale(1); } 50%{ transform: translateY(-20px) scale(1.05); } }
 
   .game-wrapper {
@@ -59,25 +55,22 @@
     font-weight: 900;
     letter-spacing: -2px;
     line-height: 1;
-    background: linear-gradient(135deg, #6bcb77 0%, #4d96ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 2px 0 rgba(0,0,0,0.08));
+    color: var(--fg);
   }
+  .title em { font-style: normal; color: var(--orange); }
 
   .scores { display: flex; gap: 8px; }
 
   .score-box {
-    background: #6bcb77;
+    background: var(--orange);
     border-radius: 14px;
     padding: 8px 14px;
     text-align: center;
     color: white;
-    box-shadow: 0 4px 0 #3a9a45;
+    box-shadow: 0 4px 0 var(--orange-dk);
     min-width: 72px;
   }
-  .score-box.best { background: #ffd93d; box-shadow: 0 4px 0 #d4aa00; color: #7a5c00; }
+  .score-box.best { background: var(--amber); box-shadow: 0 4px 0 var(--amber-dk); color: #7a5c00; }
 
   .score-label { font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.85; }
   .score-value { font-size: 22px; font-weight: 900; line-height: 1.1; }
@@ -93,7 +86,7 @@
   .hint-text { font-size: 13px; font-weight: 700; color: #b0996e; }
 
   .btn {
-    background: #4d96ff;
+    background: var(--orange);
     color: white;
     border: none;
     border-radius: 12px;
@@ -102,14 +95,14 @@
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 4px 0 #2a70d4;
+    box-shadow: 0 4px 0 var(--orange-dk);
     transition: transform 0.1s, box-shadow 0.1s;
     white-space: nowrap;
     text-decoration: none;
   }
-  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2a70d4; }
-  .btn.green  { background: #6bcb77; box-shadow: 0 4px 0 #3a9a45; }
-  .btn.muted  { background: #e8d8c0; box-shadow: 0 4px 0 #d4c2a8; color: #8b6914; }
+  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--orange-dk); }
+  .btn.green  { background: var(--orange); box-shadow: 0 4px 0 var(--orange-dk); }
+  .btn.muted  { background: var(--surface); border: 1.5px solid var(--border); box-shadow: 0 4px 0 var(--shadow); color: var(--fg); }
 
   .canvas-wrap {
     position: relative;
@@ -147,8 +140,8 @@
 
   .overlay-emoji { font-size: 56px; animation: bounce 1s ease-in-out infinite; }
   @keyframes bounce { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
-  .overlay-title { font-size: 32px; font-weight: 900; color: #333; }
-  .overlay-sub   { font-size: 15px; font-weight: 700; color: #666; }
+  .overlay-title { font-size: 32px; font-weight: 900; color: var(--fg); }
+  .overlay-sub   { font-size: 15px; font-weight: 700; color: var(--muted); }
 
   /* Speed bar */
   .speed-bar {
@@ -215,7 +208,8 @@
 
 <div class="game-wrapper">
   <div class="header">
-    <div class="title">Snake</div>
+    <a href="../index.html" class="home-btn" aria-label="홈으로">←</a>
+    <div class="title"><em>S</em>nake</div>
     <div class="scores">
       <div class="score-box">
         <div class="score-label">점수</div>
@@ -241,7 +235,6 @@
     </div>
     <div style="display:flex;gap:6px">
       <button class="btn green" id="startBtn">▶ 시작</button>
-      <a href="../index.html" class="btn muted">🏠</a>
     </div>
   </div>
 

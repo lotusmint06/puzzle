@@ -5,16 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>2048 🌟</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="stylesheet" href="../assets/tokens.css">
 <script defer src="../assets/sfx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #fff9f0;
-    --board-bg: #f0e6d3;
-    --cell-bg: #e8d8c0;
-    --accent: #ff6b6b;
-    --score-bg: #ff6b6b;
-  }
+  :root { --accent: var(--orange); --score-bg: var(--orange); }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -44,10 +39,10 @@
     opacity: 0.12;
     animation: floatShape 8s ease-in-out infinite;
   }
-  .shape:nth-child(1) { width: 200px; height: 200px; background: #ff6b6b; top: -60px; left: -60px; animation-delay: 0s; }
-  .shape:nth-child(2) { width: 150px; height: 150px; background: #ffd93d; top: 60%; right: -40px; animation-delay: 2s; }
-  .shape:nth-child(3) { width: 100px; height: 100px; background: #6bcb77; bottom: -30px; left: 30%; animation-delay: 4s; }
-  .shape:nth-child(4) { width: 80px; height: 80px; background: #4d96ff; top: 40%; left: -20px; animation-delay: 1s; }
+  .shape:nth-child(1) { width: 200px; height: 200px; background: var(--orange); top: -60px; left: -60px; animation-delay: 0s; }
+  .shape:nth-child(2) { width: 150px; height: 150px; background: var(--amber); top: 60%; right: -40px; animation-delay: 2s; }
+  .shape:nth-child(3) { width: 100px; height: 100px; background: var(--orange); bottom: -30px; left: 30%; animation-delay: 4s; }
+  .shape:nth-child(4) { width: 80px; height: 80px; background: var(--amber); top: 40%; left: -20px; animation-delay: 1s; }
 
   @keyframes floatShape {
     0%, 100% { transform: translateY(0) scale(1); }
@@ -78,38 +73,26 @@
     font-weight: 900;
     letter-spacing: -2px;
     line-height: 1;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 50%, #6bcb77 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 2px 0 rgba(0,0,0,0.08));
+    color: var(--fg);
   }
+  .title em { font-style: normal; color: var(--orange); }
 
   .scores {
     display: flex;
     align-items: stretch;
     gap: 8px;
   }
-  .home-icon {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 44px; background: #e8d8c0; color: #8b6914;
-    border-radius: 14px; font-size: 20px; text-decoration: none;
-    box-shadow: 0 4px 0 #d4c2a8; flex-shrink: 0;
-    transition: transform .1s, box-shadow .1s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .home-icon:active { transform: translateY(2px); box-shadow: 0 2px 0 #d4c2a8; }
 
   .score-box {
-    background: #ff6b6b;
+    background: var(--orange);
     border-radius: 14px;
     padding: 8px 14px;
     text-align: center;
     color: white;
-    box-shadow: 0 4px 0 #d94f4f;
+    box-shadow: 0 4px 0 var(--orange-dk);
     min-width: 72px;
   }
-  .score-box.best { background: #ffd93d; box-shadow: 0 4px 0 #d4aa00; color: #7a5c00; }
+  .score-box.best { background: var(--amber); box-shadow: 0 4px 0 var(--amber-dk); color: #7a5c00; }
   .score-box.timer-box {
     background: #6bcb77;
     box-shadow: 0 4px 0 #3a9a45;
@@ -157,7 +140,7 @@
   }
 
   .btn {
-    background: #4d96ff;
+    background: var(--orange);
     color: white;
     border: none;
     border-radius: 12px;
@@ -166,12 +149,12 @@
     font-size: 14px;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 4px 0 #2a70d4;
+    box-shadow: 0 4px 0 var(--orange-dk);
     transition: transform 0.1s, box-shadow 0.1s;
     letter-spacing: 0.3px;
     white-space: nowrap;
   }
-  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2a70d4; }
+  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--orange-dk); }
   .btn.undo { background: #a78bfa; box-shadow: 0 4px 0 #7c5cda; }
 
   /* Board */
@@ -395,14 +378,14 @@
     white-space: nowrap;
   }
   .theme-btn.active {
-    background: #ff6b6b;
+    background: var(--orange);
     color: white;
-    box-shadow: 0 3px 0 #c43c3c;
+    box-shadow: 0 3px 0 var(--orange-dk);
   }
   .grid-btn.active {
-    background: #4d96ff;
+    background: var(--orange);
     color: white;
-    box-shadow: 0 3px 0 #2a70d4;
+    box-shadow: 0 3px 0 var(--orange-dk);
   }
 
   /* Score popup */
@@ -411,7 +394,7 @@
     font-family: 'Nunito', sans-serif;
     font-size: clamp(16px, 5vw, 22px);
     font-weight: 900;
-    color: #ff6b6b;
+    color: var(--orange);
     text-shadow: 0 1px 4px rgba(0,0,0,0.15);
     pointer-events: none;
     z-index: 997;
@@ -444,7 +427,8 @@
 
 <div class="game-wrapper">
   <div class="header">
-    <div class="title">2048</div>
+    <a href="../index.html" class="home-btn" aria-label="홈으로">←</a>
+    <div class="title"><em>2</em>048</div>
     <div class="scores">
       <div class="score-box">
         <div class="score-label">점수</div>
@@ -455,7 +439,6 @@
         <div class="score-value" id="bestDisplay">0</div>
       </div>
       <div class="score-box timer-box" id="timerDisplay">⏱ 2:00</div>
-      <a href="../index.html" class="home-icon" title="홈">🏠</a>
     </div>
   </div>
 
@@ -485,7 +468,7 @@
       <div class="overlay-title"><span id="winTarget">2048</span> 달성!</div>
       <div class="overlay-sub">정말 대단해요! 계속 할까요?</div>
       <button class="btn" id="continueBtn" style="margin-top:8px">계속하기</button>
-      <button class="btn" id="winNewBtn" style="background:#ff6b6b;box-shadow:0 4px 0 #c43c3c">새 게임</button>
+      <button class="btn" id="winNewBtn">새 게임</button>
     </div>
     <div class="overlay lose" id="loseOverlay">
       <div class="overlay-emoji">😅</div>
