@@ -22,13 +22,24 @@
   --amber-dk:  #C78A00;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html.loading body { opacity: 0; }
 body {
   font-family: 'Nunito', sans-serif;
   background: var(--bg);
   min-height: 100dvh;
   display: flex; flex-direction: column; align-items: center;
   padding: 40px 16px 60px; overflow-x: hidden;
+  opacity: 1; transition: opacity .18s ease;
 }
+.sfx-btn {
+  position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 14px;
+  width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--fg); font-size: 16px; cursor: pointer;
+  box-shadow: 0 3px 0 var(--shadow); z-index: 10;
+  display: flex; align-items: center; justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.sfx-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--shadow); }
 .bg-shapes { position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden; }
 .shape { position:absolute;border-radius:50%;animation:floatShape 9s ease-in-out infinite; }
 .shape:nth-child(1){width:340px;height:340px;background:var(--orange);opacity:.07;top:-130px;left:-110px}
@@ -55,19 +66,20 @@ body {
 .game-card.coming-soon{opacity:.48;cursor:default}
 .game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}.game-card:nth-child(11){animation-delay:.57s}.game-card:nth-child(12){animation-delay:.62s}.game-card:nth-child(13){animation-delay:.67s}.game-card:nth-child(14){animation-delay:.72s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.cat-pill{position:absolute;top:10px;right:10px;font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--muted);border:1px solid var(--border);line-height:1.4}
-.mini-icon{width:64px;height:64px;border-radius:10px;box-shadow:0 3px 0 var(--shadow);flex-shrink:0;overflow:hidden;display:block}
-.mini-icon svg{display:block}
+.cat-pill{position:absolute;top:10px;right:10px;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--muted);border:1px solid var(--border);line-height:1.4}
+.mini-icon{width:72px;height:72px;border-radius:12px;box-shadow:0 3px 0 var(--shadow);flex-shrink:0;overflow:hidden;display:block}
+.mini-icon svg{display:block;width:100%;height:100%}
 .card-body{width:100%;text-align:center}
-.card-title{font-size:17px;font-weight:900;color:var(--fg);letter-spacing:-.4px;display:flex;align-items:center;justify-content:center;gap:5px}
-.card-desc{margin-top:4px;font-size:12px;font-weight:700;color:var(--muted);line-height:1.45}
-.play-btn{background:var(--orange);color:white;border:none;border-radius:12px;padding:10px 0;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--orange-dk);letter-spacing:.3px;width:100%;pointer-events:none;transition:transform .1s,box-shadow .1s}
+.card-title{font-size:19px;font-weight:900;color:var(--fg);letter-spacing:-.4px;display:flex;align-items:center;justify-content:center;gap:5px}
+.card-desc{margin-top:5px;font-size:13px;font-weight:700;color:var(--muted);line-height:1.45}
+.play-btn{background:var(--orange);color:white;border:none;border-radius:12px;padding:11px 0;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--orange-dk);letter-spacing:.3px;width:100%;pointer-events:none;transition:transform .1s,box-shadow .1s}
 .game-card:not(.coming-soon):active .play-btn{transform:translateY(3px);box-shadow:0 1px 0 var(--orange-dk)}
 .coming-soon .play-btn{background:var(--border);box-shadow:0 4px 0 var(--shadow);color:var(--muted)}
 .footer{font-size:12px;font-weight:700;color:var(--muted);opacity:.7;animation:fadeUp .4s .55s ease both}
 </style>
 </head>
 <body>
+<button class="sfx-btn" data-sfx-toggle onclick="toggleSfx(this)" aria-label="소리 켜기/끄기">🔊</button>
 <div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
 <div class="wrapper">
   <div class="header">
@@ -456,5 +468,11 @@ body {
   </div>
   <div class="footer">더 많은 게임이 추가될 예정이에요</div>
 </div>
+<script src="./assets/sfx.js"></script>
+<script>
+  document.querySelectorAll('.game-card').forEach(c => {
+    c.addEventListener('pointerdown', () => SFX.tap());
+  });
+</script>
 </body>
 </html>

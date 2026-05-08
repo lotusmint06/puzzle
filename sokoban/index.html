@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>소코반 📦</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script defer src="../assets/sfx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff9f0;--board-bg:#f0e6d3;--floor:#fdf5e6;--wall:#b0996e;--target:#FF9F43;--box:#FF9F43;--box-done:#6BCB77;--text:#5a3e1b;--muted:#b0996e}
@@ -97,6 +98,8 @@ body{
 .overlay.show .ov-emoji{animation:bounceIn .4s ease}
 
 @media (max-width:380px){.cell{width:36px;height:36px}}
+.sfx-btn{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));right:14px;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(0,0,0,.1);background:rgba(255,255,255,.95);color:#5a3e1b;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);z-index:60;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .1s,box-shadow .1s}
+.sfx-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 </style>
 </head>
 <body>
@@ -407,17 +410,23 @@ function move(dr, dc) {
 
   if (boxes[nr][nc]) {
     const br = nr + dr, bc = nc + dc;
-    if (!inBounds(br, bc) || walls[br][bc] || boxes[br][bc]) return;
+    if (!inBounds(br, bc) || walls[br][bc] || boxes[br][bc]) {
+      if (window.SFX) SFX.error();
+      return;
+    }
     history.push(snapshot());
     boxes[nr][nc] = false;
     boxes[br][bc] = true;
     player = {r: nr, c: nc};
+    if (window.SFX) SFX.bump();
   } else {
     history.push(snapshot());
     player = {r: nr, c: nc};
+    if (window.SFX) SFX.click();
   }
   render();
   if (updateStatus()) {
+    if (window.SFX) SFX.win();
     setTimeout(() => {
       document.getElementById('ovSub').textContent =
         `${DIFFICULTIES[currentDiff].name} · 퍼즐 #${puzzleNum}`;
@@ -446,5 +455,6 @@ document.addEventListener('keydown', e => {
 
 newPuzzle();
 </script>
+<button class="sfx-btn" data-sfx-toggle onclick="toggleSfx(this)" aria-label="소리">🔊</button>
 </body>
 </html>

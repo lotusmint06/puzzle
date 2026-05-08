@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>벽돌깨기 🧱</title>
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script defer src="../assets/sfx.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#fff9f0;--board-bg:#f0e6d3;--floor:#fdf5e6;--text:#5a3e1b;--muted:#b0996e}
@@ -63,6 +64,8 @@ canvas{display:block;background:var(--floor);border-radius:12px;touch-action:non
 .ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
 @keyframes bounceIn{0%{transform:scale(.7)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
 .overlay.show .ov-emoji{animation:bounceIn .4s ease}
+.sfx-btn{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));right:14px;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(0,0,0,.1);background:rgba(255,255,255,.95);color:#5a3e1b;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);z-index:60;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .1s,box-shadow .1s}
+.sfx-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
 </style>
 </head>
 <body>
@@ -249,6 +252,7 @@ function destroyBrick(idx) {
   popBrick(b);
   score += 10;
   if (b.isItem) dropItem(b);
+  if (window.SFX) SFX.pop();
 }
 
 function triggerBomb(hit) {
@@ -261,6 +265,7 @@ function triggerBomb(hit) {
 }
 
 function activateItem(type) {
+  if (window.SFX) SFX.success();
   const now = performance.now();
   switch (type) {
     case 'wide':
@@ -382,6 +387,7 @@ function update() {
 
     if (bricks.length === 0) {
       gameState = 'win';
+      if (window.SFX) SFX.win();
       if (level < LEVELS.length) {
         showOverlay('🎉', '레벨 완성!', `점수: ${score}`, '다음 레벨 ▶', nextLevel);
       } else {
@@ -399,8 +405,10 @@ function update() {
     document.getElementById('lvsEl').textContent = '❤'.repeat(Math.max(0, lives));
     if (lives <= 0) {
       gameState = 'lose';
+      if (window.SFX) SFX.lose();
       showOverlay('💥', '게임 오버', `점수: ${score}`, '새 게임', newGame);
     } else {
+      if (window.SFX) SFX.error();
       activeItems = { wide:0, slow:0, pierce:0, bomb:false };
       paddleW = basePaddleW;
       resetBalls();
@@ -664,5 +672,6 @@ resize();
 newGame();
 loop();
 </script>
+<button class="sfx-btn" data-sfx-toggle onclick="toggleSfx(this)" aria-label="소리">🔊</button>
 </body>
 </html>

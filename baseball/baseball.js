@@ -47,6 +47,7 @@ function submitGuess() {
   const guess = input.value.trim();
 
   if (!isValidGuess(guess)) {
+    if (window.SFX) SFX.error();
     input.classList.add('shake');
     setTimeout(() => input.classList.remove('shake'), 400);
     return;
@@ -62,11 +63,13 @@ function submitGuess() {
 
   if (s === DIGITS) {
     gameState = 'won';
+    if (window.SFX) SFX.win();
     setTimeout(() => showOverlay(true), 300);
   } else if (tries >= MAX_TRIES) {
     gameState = 'lost';
+    if (window.SFX) SFX.lose();
     setTimeout(() => showOverlay(false), 300);
-  }
+  } else if (window.SFX) SFX.click();
 }
 
 function isValidGuess(guess) {

@@ -95,12 +95,14 @@ function tick() {
   if (head.x === food.x && head.y === food.y) {
     score += 10;
     grew = true;
+    if (window.SFX) SFX.pop();
     placeFood();
     scheduleBonus();
     updateSpeed();
   } else if (bonusFood && head.x === bonusFood.x && head.y === bonusFood.y) {
     score += 30;
     grew = true;
+    if (window.SFX) SFX.success();
     bonusFood = null;
     clearTimeout(bonusTimer);
   }
@@ -116,6 +118,7 @@ function die() {
   clearTimeout(bonusTimer);
   setDpad(false);
   gameState = 'dead';
+  if (window.SFX) SFX.lose();
   if (score > best) {
     best = score;
     localStorage.setItem(bestKey(), best);

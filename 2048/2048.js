@@ -222,6 +222,7 @@ function move(dir) {
   }
 
   if (!moved) { prevBoard = null; return; }
+  if (window.SFX) (totalMerged > 0 ? SFX.pop() : SFX.click());
 
   if (timerDuration > 0 && !timerStarted) {
     timerStarted = true;
@@ -241,9 +242,11 @@ function move(dir) {
   const target = WIN_TARGET[GRID] ?? 2048;
   if (maxVal >= target && !continued) {
     stopTimer();
+    if (window.SFX) SFX.win();
     setTimeout(() => { showWin(target); launchConfetti(); }, 350);
   } else if (isGameOver()) {
     stopTimer();
+    if (window.SFX) SFX.lose();
     setTimeout(showLose, 350);
   }
 }
