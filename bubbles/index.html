@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>버블 팝 🫧</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f0f2e;--text:#fff;--muted:#8888cc}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+.wrapper{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:420px}
+.header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.title{font-size:clamp(26px,7vw,36px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,#FF5252 0%,#FFD93D 50%,#6BCB77 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.btn{background:#ffffff18;color:white;border:none;border-radius:10px;padding:8px 13px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;transition:background .15s}
+.btn:active{background:#ffffff30}
+.btn.home{background:#ffffff10}
+.score-row{display:flex;gap:8px;width:100%}
+.score-box{flex:1;background:#ffffff10;border-radius:14px;padding:8px 12px;text-align:center}
+.score-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.score-val{font-size:22px;font-weight:900;color:white}
+canvas{border-radius:16px;display:block;touch-action:none;cursor:crosshair}
+.next-row{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:800;color:var(--muted)}
+
+.overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(10,10,40,.93);backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+.ov-emoji{font-size:68px}
+.ov-title{font-size:28px;font-weight:900;color:white}
+.ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
+@keyframes bounceIn{0%{transform:scale(.6)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
+.overlay.show .ov-emoji{animation:bounceIn .4s ease}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div class="title">버블 팝</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="newGame()">새 게임</button>
+      <a href="../index.html" class="btn home">🏠</a>
+    </div>
+  </div>
+
+  <div class="score-row">
+    <div class="score-box">
+      <div class="score-label">점수</div>
+      <div class="score-val" id="scoreEl">0</div>
+    </div>
+    <div class="score-box">
+      <div class="score-label">최고</div>
+      <div class="score-val" id="bestEl">0</div>
+    </div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="next-row">
+    다음 &nbsp;
+    <canvas id="nextCanvas" width="32" height="32"></canvas>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-emoji" id="ovEmoji"></div>
+  <div class="ov-title" id="ovTitle"></div>
+  <div class="ov-sub"   id="ovSub"></div>
+  <button class="btn" onclick="newGame()" style="margin-top:8px;font-size:15px;padding:12px 24px">새 게임</button>
+  <a href="../index.html" class="btn home">🏠 홈으로</a>
+</div>
+
+<script>
+// ── Colors ──
+const PALETTE = ['#FF5252','#4D96FF','#6BCB77','#FFD93D','#A78BFA','#FF9F43'];
+const DARKEN  = ['#C43C3C','#2a70d4','#3a9a45','#c4a000','#7c5cda','#c47820'];
+
+// ── Canvas setup ──
+const canvas    = document.getElementById('canvas');
+const ctx       = canvas.getContext('2d');
+const nextCanvas= document.getElementById('nextCanvas');
+const nextCtx   = nextCanvas.getContext('2d');
+
+let W, H, R; // canvas dimensions and bubble radius
+
+function resize() {
+  const wrap = document.querySelector('.wrapper');
+  const available = Math.min(wrap.clientWidth, 440);
+  W = available;
+  // R so that 9 bubbles fit across with slight padding
+  R = Math.floor(W / 18); // 9 cols × 2R each
+  H = Math.round(W * 1.2);
+  canvas.width = W; canvas.height = H;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+}
+
+// ── Grid ──
+// hex-offset grid: even rows start at R, odd rows at 2R
+const COLS = 9;
+const NUM_COLORS = 5; // use 5 colors
+
+function rowCols(row) { return row % 2 === 0 ? COLS : COLS - 1; }
+
+function bubbleX(row, col) {
+  const offset = row % 2 === 0 ? R : R * 2;
+  return offset + col * R * 2;
+}
+
+function bubbleY(row) {
+  return R * 1.1 + row * R * 1.732;
+}
+
+let grid = []; // grid[row][col] = colorIndex | null
+
+function initGrid() {
+  grid = [];
+  const startRows = 7;
+  for (let row = 0; row < startRows; row++) {
+    const cols = rowCols(row);
+    grid[row] = Array.from({length: cols}, () => Math.floor(Math.random() * NUM_COLORS));
+  }
+}
+
+// ── Shooter ──
+let shooterColor = 0;
+let nextColor    = 0;
+let shooterAngle = -Math.PI / 2; // pointing up
+let shooting     = false;
+
+// Bullet
+let bx, by, bdx, bdy;
+const SPEED = 10;
+
+// ── Score ──
+let score = 0;
+let best  = +localStorage.getItem('bubble-best') || 0;
+let gameOver = false;
+
+function updateScoreUI() {
+  document.getElementById('scoreEl').textContent = score;
+  document.getElementById('bestEl').textContent  = best;
+}
+
+// ── Draw ──
+function drawBubble(ctx_, x, y, r, colorIdx, alpha=1) {
+  if (colorIdx === null || colorIdx === undefined) return;
+  const c = PALETTE[colorIdx];
+  ctx_.save();
+  ctx_.globalAlpha = alpha;
+  ctx_.beginPath();
+  ctx_.arc(x, y, r * 0.88, 0, Math.PI * 2);
+  ctx_.fillStyle = c;
+  ctx_.shadowColor = DARKEN[colorIdx];
+  ctx_.shadowBlur  = 6;
+  ctx_.shadowOffsetY = 3;
+  ctx_.fill();
+  // shine
+  ctx_.shadowBlur = 0;
+  ctx_.beginPath();
+  ctx_.arc(x - r*0.28, y - r*0.28, r*0.28, 0, Math.PI*2);
+  ctx_.fillStyle = 'rgba(255,255,255,0.38)';
+  ctx_.fill();
+  ctx_.restore();
+}
+
+function drawGrid() {
+  for (let row = 0; row < grid.length; row++) {
+    if (!grid[row]) continue;
+    for (let col = 0; col < grid[row].length; col++) {
+      if (grid[row][col] === null) continue;
+      drawBubble(ctx, bubbleX(row, col), bubbleY(row), R, grid[row][col]);
+    }
+  }
+}
+
+function drawShooter() {
+  const cx = W / 2, cy = H - R * 2.5;
+  // Draw current bubble
+  drawBubble(ctx, cx, cy, R, shooterColor);
+
+  // Draw aim line
+  const aimLen = R * 3;
+  const dx = Math.cos(shooterAngle), dy = Math.sin(shooterAngle);
+  ctx.save();
+  ctx.setLineDash([8, 8]);
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + dx * aimLen, cy + dy * aimLen);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawBullet() {
+  if (!shooting) return;
+  drawBubble(ctx, bx, by, R, shooterColor);
+}
+
+function drawNextBubble() {
+  nextCtx.clearRect(0, 0, 32, 32);
+  drawBubble(nextCtx, 16, 16, 14, nextColor);
+}
+
+function renderAll() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background stars
+  ctx.fillStyle = '#ffffff08';
+  for (let i = 0; i < 40; i++) {
+    ctx.beginPath();
+    ctx.arc(starData[i*2]*W, starData[i*2+1]*H, 1.2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  drawGrid();
+  drawBullet();
+  if (!shooting && !gameOver) drawShooter();
+
+  // Danger line
+  const dangerY = H - R * 4;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255,80,80,0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([6,6]);
+  ctx.beginPath();
+  ctx.moveTo(0, dangerY);
+  ctx.lineTo(W, dangerY);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Pre-compute star positions
+const starData = Array.from({length:80}, () => Math.random());
+
+// ── Aim & Shoot ──
+function setAngleFromPoint(x, y) {
+  const cx = W/2, cy = H - R*2.5;
+  let angle = Math.atan2(y - cy, x - cx);
+  // Clamp so we can't shoot downward
+  if (angle > -0.15) angle = -0.15;
+  if (angle < -Math.PI + 0.15) angle = -Math.PI + 0.15;
+  shooterAngle = angle;
+}
+
+canvas.addEventListener('pointermove', e => {
+  if (shooting || gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  setAngleFromPoint(e.clientX - rect.left, e.clientY - rect.top);
+  renderAll();
+});
+
+canvas.addEventListener('click', e => {
+  if (shooting || gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  setAngleFromPoint(e.clientX - rect.left, e.clientY - rect.top);
+  shoot();
+});
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (shooting || gameOver) return;
+  const rect = canvas.getBoundingClientRect();
+  const t = e.changedTouches[0];
+  setAngleFromPoint(t.clientX - rect.left, t.clientY - rect.top);
+  shoot();
+}, {passive:false});
+
+function shoot() {
+  shooting = true;
+  bx = W / 2; by = H - R * 2.5;
+  bdx = Math.cos(shooterAngle) * SPEED;
+  bdy = Math.sin(shooterAngle) * SPEED;
+  animateBullet();
+}
+
+// ── Bullet animation ──
+function animateBullet() {
+  bx += bdx; by += bdy;
+
+  // Wall bounce
+  if (bx - R < 0)    { bx = R;    bdx = Math.abs(bdx); }
+  if (bx + R > W)    { bx = W-R;  bdx = -Math.abs(bdx); }
+
+  // Hit top
+  if (by - R < R * 0.5) {
+    snapToGrid();
+    return;
+  }
+
+  // Hit a bubble in grid
+  if (hitGrid()) {
+    snapToGrid();
+    return;
+  }
+
+  renderAll();
+  requestAnimationFrame(animateBullet);
+}
+
+function hitGrid() {
+  for (let row = 0; row < grid.length; row++) {
+    if (!grid[row]) continue;
+    for (let col = 0; col < grid[row].length; col++) {
+      if (grid[row][col] === null) continue;
+      const gx = bubbleX(row, col), gy = bubbleY(row);
+      if (Math.hypot(bx - gx, by - gy) < R * 1.85) return true;
+    }
+  }
+  return false;
+}
+
+// ── Snap bullet to nearest empty grid cell ──
+function snapToGrid() {
+  // Find nearest grid position
+  let bestDist = Infinity, bestRow = 0, bestCol = 0;
+
+  // Search in rows near the bullet
+  const approxRow = Math.max(0, Math.round((by - R * 1.1) / (R * 1.732)));
+  const searchFrom = Math.max(0, approxRow - 1);
+  const searchTo   = Math.min(approxRow + 2, 20);
+
+  for (let row = searchFrom; row <= searchTo; row++) {
+    const cols = rowCols(row);
+    for (let col = 0; col < cols; col++) {
+      const existing = grid[row] ? grid[row][col] : undefined;
+      if (existing !== null && existing !== undefined) continue;
+      const gx = bubbleX(row, col), gy = bubbleY(row);
+      const d = Math.hypot(bx - gx, by - gy);
+      if (d < bestDist) { bestDist = d; bestRow = row; bestCol = col; }
+    }
+  }
+
+  // Also consider new rows
+  if (bestDist > R * 2) {
+    const newRow = grid.length === 0 ? 0 : grid.length;
+    const cols = rowCols(newRow);
+    for (let col = 0; col < cols; col++) {
+      const gx = bubbleX(newRow, col), gy = bubbleY(newRow);
+      const d = Math.hypot(bx - gx, by - gy);
+      if (d < bestDist) { bestDist = d; bestRow = newRow; bestCol = col; }
+    }
+  }
+
+  // Place bubble
+  while (grid.length <= bestRow) {
+    const r = grid.length;
+    grid.push(Array(rowCols(r)).fill(null));
+  }
+  grid[bestRow][bestCol] = shooterColor;
+
+  // Pop matching
+  const popped = popGroup(bestRow, bestCol);
+  if (popped >= 3) {
+    score += popped * 10;
+    if (score > best) { best = score; localStorage.setItem('bubble-best', best); }
+    updateScoreUI();
+    removeFloating();
+  }
+
+  // Check lose: any bubble below danger line
+  checkLose();
+  if (gameOver) { renderAll(); return; }
+
+  // Check win: grid empty
+  if (isGridEmpty()) {
+    renderAll();
+    showResult(true);
+    return;
+  }
+
+  // Next bubble
+  shooterColor = nextColor;
+  nextColor = Math.floor(Math.random() * NUM_COLORS);
+  drawNextBubble();
+  shooting = false;
+  renderAll();
+}
+
+// ── Pop group of same color (flood fill) ──
+function popGroup(startRow, startCol) {
+  const color = grid[startRow][startCol];
+  const visited = new Set();
+  const queue = [[startRow, startCol]];
+  const toRemove = [];
+
+  while (queue.length) {
+    const [r, c] = queue.pop();
+    const key = r+'_'+c;
+    if (visited.has(key)) continue;
+    visited.add(key);
+    if (!grid[r] || grid[r][c] !== color) continue;
+    toRemove.push([r, c]);
+    for (const [nr, nc] of hexNeighbors(r, c)) {
+      if (!visited.has(nr+'_'+nc)) queue.push([nr, nc]);
+    }
+  }
+
+  if (toRemove.length >= 3) {
+    for (const [r,c] of toRemove) grid[r][c] = null;
+    return toRemove.length;
+  }
+  return 0;
+}
+
+// ── Hex neighbors (for offset-row hex grid) ──
+function hexNeighbors(row, col) {
+  const even = row % 2 === 0;
+  const neighbors = [
+    [row, col-1], [row, col+1],
+    [row-1, even ? col-1 : col], [row-1, even ? col : col+1],
+    [row+1, even ? col-1 : col], [row+1, even ? col : col+1],
+  ];
+  return neighbors.filter(([r,c]) => {
+    if (r<0||c<0) return false;
+    if (!grid[r]) return false;
+    if (c >= rowCols(r)) return false;
+    return true;
+  });
+}
+
+// ── Remove bubbles not connected to top row ──
+function removeFloating() {
+  // BFS from top row
+  const connected = new Set();
+  const queue = [];
+  if (!grid[0]) return;
+  for (let c = 0; c < grid[0].length; c++) {
+    if (grid[0][c] !== null) {
+      queue.push([0, c]);
+      connected.add('0_'+c);
+    }
+  }
+  while (queue.length) {
+    const [r, c] = queue.shift();
+    for (const [nr, nc] of hexNeighbors(r, c)) {
+      const k = nr+'_'+nc;
+      if (!connected.has(k) && grid[nr] && grid[nr][nc] !== null) {
+        connected.add(k); queue.push([nr, nc]);
+      }
+    }
+  }
+  // Remove all unconnected bubbles
+  for (let r = 0; r < grid.length; r++) {
+    if (!grid[r]) continue;
+    for (let c = 0; c < grid[r].length; c++) {
+      if (grid[r][c] !== null && !connected.has(r+'_'+c)) {
+        grid[r][c] = null;
+        score += 5;
+      }
+    }
+  }
+  updateScoreUI();
+}
+
+function isGridEmpty() {
+  return grid.every(row => !row || row.every(c => c === null));
+}
+
+function checkLose() {
+  const dangerY = H - R * 4;
+  for (let row = 0; row < grid.length; row++) {
+    if (!grid[row]) continue;
+    for (let col = 0; col < grid[row].length; col++) {
+      if (grid[row][col] !== null && bubbleY(row) > dangerY) {
+        gameOver = true;
+        setTimeout(() => showResult(false), 200);
+        return;
+      }
+    }
+  }
+}
+
+function showResult(win) {
+  document.getElementById('ovEmoji').textContent = win ? '🎉' : '💥';
+  document.getElementById('ovTitle').textContent = win ? '클리어!' : '게임 오버';
+  document.getElementById('ovSub').textContent   = `점수: ${score}`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+// ── New game ──
+function newGame() {
+  score = 0; gameOver = false; shooting = false;
+  shooterAngle = -Math.PI / 2;
+  shooterColor = Math.floor(Math.random() * NUM_COLORS);
+  nextColor    = Math.floor(Math.random() * NUM_COLORS);
+  updateScoreUI();
+  initGrid();
+  drawNextBubble();
+  document.getElementById('overlay').classList.remove('show');
+  renderAll();
+}
+
+// ── Init ──
+resize();
+newGame();
+</script>
+</body>
+</html>

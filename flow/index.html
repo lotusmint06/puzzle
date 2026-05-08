@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Flow 🌈</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#fff9f0; --board:#EDDDCA; --cell:#E0CCB4; --text:#5a3e1b; --muted:#b0996e; }
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+body {
+  font-family:'Nunito',sans-serif; background:var(--bg);
+  min-height:100dvh; display:flex; flex-direction:column; align-items:center;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.08;animation:floatShape 9s ease-in-out infinite}
+.shape:nth-child(1){width:220px;height:220px;background:#FF5252;top:-80px;left:-70px}
+.shape:nth-child(2){width:160px;height:160px;background:#4D96FF;top:55%;right:-50px;animation-delay:2.5s}
+.shape:nth-child(3){width:110px;height:110px;background:#6BCB77;bottom:-30px;left:30%;animation-delay:4.5s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+.wrapper{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px}
+
+.header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.title{font-size:clamp(28px,8vw,40px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,#FF5252 0%,#4D96FF 50%,#6BCB77 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.btn{background:#e8d8c0;color:#8b6914;border:none;border-radius:10px;padding:8px 13px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 3px 0 #d0c0a0;text-decoration:none;display:inline-flex;align-items:center;
+  transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d0c0a0}
+.btn.blue{background:#4D96FF;color:white;box-shadow:0 3px 0 #2a70d4}
+.btn.blue:active{box-shadow:0 1px 0 #2a70d4}
+
+.info-bar{width:100%;display:flex;align-items:center;justify-content:space-between;
+  background:var(--board);border-radius:14px;padding:9px 14px;box-shadow:0 3px 0 #d4c2a8}
+.level-lbl{font-size:16px;font-weight:900;color:var(--text)}
+.status-lbl{font-size:12px;font-weight:700;color:var(--muted)}
+.nav-btns{display:flex;gap:5px}
+
+.board-wrap{width:100%;aspect-ratio:1;background:var(--board);border-radius:20px;
+  padding:8px;box-shadow:0 8px 0 #d4c2a8,0 12px 30px rgba(0,0,0,.1);
+  touch-action:none;user-select:none;-webkit-user-select:none}
+#board{width:100%;height:100%;display:grid;gap:3px;touch-action:none}
+.cell{position:relative;background:var(--cell);border-radius:6px;overflow:visible}
+
+/* Pipe arms */
+.arm{position:absolute;background:var(--c,transparent);z-index:1;pointer-events:none}
+.arm-t{width:38%;height:54%;top:0;left:50%;transform:translateX(-50%)}
+.arm-b{width:38%;height:54%;bottom:0;left:50%;transform:translateX(-50%)}
+.arm-l{height:38%;width:54%;left:0;top:50%;transform:translateY(-50%)}
+.arm-r{height:38%;width:54%;right:0;top:50%;transform:translateY(-50%)}
+/* Pip */
+.pip{position:absolute;z-index:2;border-radius:50%;background:var(--c,transparent);
+  width:36%;height:36%;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cell.is-dot .pip{width:62%;height:62%;box-shadow:0 2px 0 rgba(0,0,0,.18),inset 0 2px 0 rgba(255,255,255,.3)}
+/* Completed pulse */
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.08)}}
+.cell.done.is-dot .pip{animation:pulse 1.2s ease-in-out infinite}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(240,225,200,.93);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+.ov-emoji{font-size:64px}
+.ov-title{font-size:30px;font-weight:900;color:var(--text)}
+.ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
+@keyframes bounceIn{0%{transform:scale(.7)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.overlay.show .ov-emoji{animation:bounceIn .4s ease}
+</style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+<div class="wrapper">
+  <div class="header">
+    <div class="title">Flow</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="resetLevel()">↺ 다시</button>
+      <a href="../index.html" class="btn">🏠</a>
+    </div>
+  </div>
+
+  <div class="info-bar">
+    <div>
+      <div class="level-lbl" id="levelLbl">레벨 1</div>
+      <div class="status-lbl" id="statusLbl">파이프를 연결하세요</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn" id="prevBtn" onclick="changeLevel(-1)">◀</button>
+      <button class="btn" id="nextBtn" onclick="changeLevel(1)">▶</button>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <div id="board"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-emoji">🎉</div>
+  <div class="ov-title">완성!</div>
+  <div class="ov-sub" id="ovSub"></div>
+  <button class="btn blue" onclick="changeLevel(1)" style="margin-top:4px">다음 레벨 ▶</button>
+  <button class="btn" onclick="resetLevel()">다시 풀기</button>
+</div>
+
+<script>
+const COLORS = {
+  red:'#FF5252', blue:'#4D96FF', green:'#6BCB77', yellow:'#FFD93D',
+  orange:'#FF9F43', purple:'#A78BFA', teal:'#4DC0B5', pink:'#FF85A2',
+};
+
+// Each level: { size, dots: { colorName: [[r,c],[r,c]] } }
+const LEVELS = [
+  {size:5, dots:{red:[[0,0],[4,4]], blue:[[0,4],[4,0]]}},
+  {size:5, dots:{red:[[0,0],[3,4]], blue:[[0,4],[4,1]], green:[[2,2],[4,3]]}},
+  {size:5, dots:{red:[[0,0],[4,4]], blue:[[0,4],[4,0]], green:[[1,2],[3,2]], yellow:[[2,0],[2,4]]}},
+  {size:6, dots:{red:[[0,0],[5,5]], blue:[[0,5],[5,0]], green:[[2,2],[3,3]]}},
+  {size:6, dots:{red:[[0,0],[5,5]], blue:[[0,5],[5,0]], green:[[0,2],[5,3]], yellow:[[2,5],[3,0]]}},
+  {size:6, dots:{red:[[0,0],[5,5]], blue:[[0,5],[5,0]], green:[[1,2],[4,3]], yellow:[[0,3],[5,2]], orange:[[2,0],[3,5]]}},
+  {size:7, dots:{red:[[0,0],[6,6]], blue:[[0,6],[6,0]], green:[[0,3],[6,3]], yellow:[[3,0],[3,6]], orange:[[1,1],[5,5]]}},
+  {size:7, dots:{red:[[0,0],[6,6]], blue:[[0,6],[6,0]], green:[[0,3],[6,3]], yellow:[[3,0],[3,6]], orange:[[1,2],[5,4]], purple:[[2,5],[4,1]]}},
+  {size:8, dots:{red:[[0,0],[7,7]], blue:[[0,7],[7,0]], green:[[0,3],[7,4]], yellow:[[3,0],[4,7]], orange:[[1,1],[6,6]], purple:[[1,6],[6,1]]}},
+  {size:8, dots:{red:[[0,0],[7,7]], blue:[[0,7],[7,0]], green:[[0,3],[7,4]], yellow:[[3,0],[4,7]], orange:[[1,1],[6,6]], purple:[[1,6],[6,1]], teal:[[3,3],[4,4]]}},
+  {size:9, dots:{red:[[0,0],[8,8]], blue:[[0,8],[8,0]], green:[[0,4],[8,4]], yellow:[[4,0],[4,8]], orange:[[1,1],[7,7]], purple:[[1,7],[7,1]], teal:[[2,4],[6,4]], pink:[[4,2],[4,6]]}},
+  {size:9, dots:{red:[[0,0],[8,8]], blue:[[0,8],[8,0]], green:[[0,4],[8,4]], yellow:[[4,0],[4,8]], orange:[[1,2],[7,6]], purple:[[2,7],[6,1]], teal:[[1,6],[7,2]], pink:[[3,3],[5,5]]}},
+];
+
+let levelIdx = 0;
+let SIZE = 5;
+let grid = []; // grid[r][c] = { dot:str|null, pipe:str|null }
+let completed = new Set();
+
+let drawing = false;
+let drawColor = null;
+let drawPath = [];
+
+const boardEl = document.getElementById('board');
+const overlayEl = document.getElementById('overlay');
+
+function initLevel(idx) {
+  levelIdx = Math.max(0, Math.min(LEVELS.length - 1, idx));
+  const lv = LEVELS[levelIdx];
+  SIZE = lv.size;
+  completed = new Set();
+  drawing = false; drawColor = null; drawPath = [];
+
+  grid = Array.from({length:SIZE}, () =>
+    Array.from({length:SIZE}, () => ({dot:null, pipe:null})));
+
+  for (const [color, positions] of Object.entries(lv.dots))
+    for (const [r,c] of positions) grid[r][c].dot = color;
+
+  document.getElementById('levelLbl').textContent = `레벨 ${levelIdx+1}`;
+  updateStatus();
+  document.getElementById('prevBtn').style.opacity = levelIdx === 0 ? '.4' : '1';
+  document.getElementById('nextBtn').style.opacity = levelIdx === LEVELS.length-1 ? '.4' : '1';
+  overlayEl.classList.remove('show');
+
+  buildBoard();
+  renderAll();
+}
+
+function updateStatus() {
+  const lv = LEVELS[levelIdx];
+  const total = Object.keys(lv.dots).length;
+  document.getElementById('statusLbl').textContent =
+    completed.size === total
+      ? '모두 연결 완료! 🎉'
+      : `${completed.size}/${total} 연결됨`;
+}
+
+function buildBoard() {
+  const gap = 3;
+  boardEl.style.gridTemplateColumns = `repeat(${SIZE},1fr)`;
+  boardEl.style.gridTemplateRows    = `repeat(${SIZE},1fr)`;
+  boardEl.style.gap = gap + 'px';
+  boardEl.innerHTML = '';
+  for (let r = 0; r < SIZE; r++) {
+    for (let c = 0; c < SIZE; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r; cell.dataset.c = c;
+      cell.innerHTML = `
+        <div class="arm arm-t"></div>
+        <div class="arm arm-b"></div>
+        <div class="arm arm-l"></div>
+        <div class="arm arm-r"></div>
+        <div class="pip"></div>`;
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+function cellEl(r, c) { return boardEl.children[r * SIZE + c]; }
+
+function renderCell(r, c) {
+  const g = grid[r][c];
+  const cell = cellEl(r, c);
+  const pipeColor = g.pipe ? COLORS[g.pipe] : null;
+  const dotColor  = g.dot  ? COLORS[g.dot]  : null;
+
+  cell.className = 'cell' + (g.dot ? ' is-dot' : '') + (g.dot && completed.has(g.dot) ? ' done' : '');
+
+  const arms = getArms(r, c, g.pipe);
+  const [at, ab, al, ar, pip] = cell.children;
+  const setArm = (el, show, color) => {
+    el.style.setProperty('--c', show ? color : 'transparent');
+  };
+  setArm(at, arms.t, pipeColor); setArm(ab, arms.b, pipeColor);
+  setArm(al, arms.l, pipeColor); setArm(ar, arms.r, pipeColor);
+
+  if (dotColor) {
+    pip.style.setProperty('--c', dotColor);
+    pip.style.display = 'block';
+  } else if (pipeColor) {
+    pip.style.setProperty('--c', pipeColor);
+    pip.style.display = 'block';
+  } else {
+    pip.style.display = 'none';
+  }
+}
+
+function renderAll() {
+  for (let r = 0; r < SIZE; r++)
+    for (let c = 0; c < SIZE; c++)
+      renderCell(r, c);
+}
+
+function getArms(r, c, color) {
+  if (!color) return {t:false,b:false,l:false,r:false};
+  return {
+    t: pipeAt(r-1,c) === color,
+    b: pipeAt(r+1,c) === color,
+    l: pipeAt(r,c-1) === color,
+    r: pipeAt(r,c+1) === color,
+  };
+}
+
+function pipeAt(r, c) {
+  if (r<0||r>=SIZE||c<0||c>=SIZE) return null;
+  return grid[r][c].pipe;
+}
+
+function cellFromPoint(x, y) {
+  const rect = boardEl.getBoundingClientRect();
+  const cw = rect.width / SIZE, ch = rect.height / SIZE;
+  const c = Math.floor((x - rect.left) / cw);
+  const r = Math.floor((y - rect.top)  / ch);
+  if (r<0||r>=SIZE||c<0||c>=SIZE) return null;
+  return {r, c};
+}
+
+function isAdj(r1,c1,r2,c2) {
+  return (Math.abs(r1-r2)===1&&c1===c2)||(Math.abs(c1-c2)===1&&r1===r2);
+}
+
+function clearPipe(color) {
+  for (let r=0;r<SIZE;r++)
+    for (let c=0;c<SIZE;c++)
+      if (grid[r][c].pipe===color) grid[r][c].pipe=null;
+  completed.delete(color);
+}
+
+function checkWin() {
+  const total = Object.keys(LEVELS[levelIdx].dots).length;
+  if (completed.size === total) {
+    setTimeout(() => {
+      document.getElementById('ovSub').textContent = `레벨 ${levelIdx+1} 완성!`;
+      overlayEl.classList.add('show');
+    }, 300);
+  }
+  updateStatus();
+}
+
+// ── Pointer events ──
+boardEl.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  const pos = cellFromPoint(e.clientX, e.clientY);
+  if (!pos) return;
+  const {r, c} = pos;
+  const g = grid[r][c];
+
+  // Only start from a dot cell
+  if (!g.dot && !g.pipe) return;
+
+  // Determine draw color
+  const color = g.dot || g.pipe;
+  drawing = true;
+  drawColor = color;
+  clearPipe(color);
+
+  // If clicking on a dot, start from that dot
+  // If clicking on an empty cell of a former pipe, start from first dot of that color
+  let startR = r, startC = c;
+  if (!g.dot) {
+    const dots = LEVELS[levelIdx].dots[color];
+    startR = dots[0][0]; startC = dots[0][1];
+  }
+
+  drawPath = [{r: startR, c: startC}];
+  grid[startR][startC].pipe = color;
+
+  boardEl.setPointerCapture(e.pointerId);
+  renderAll();
+}, {passive:false});
+
+boardEl.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const pos = cellFromPoint(e.clientX, e.clientY);
+  if (!pos) return;
+  const {r, c} = pos;
+  const last = drawPath[drawPath.length - 1];
+
+  if (!isAdj(last.r, last.c, r, c)) return;
+
+  // Going backwards → retrace
+  if (drawPath.length >= 2) {
+    const prev = drawPath[drawPath.length - 2];
+    if (prev.r === r && prev.c === c) {
+      const rem = drawPath.pop();
+      if (!grid[rem.r][rem.c].dot) grid[rem.r][rem.c].pipe = null;
+      // Keep dot cells with their pipe for visual
+      grid[rem.r][rem.c].pipe = null;
+      renderAll();
+      return;
+    }
+  }
+
+  // Already in path? Skip
+  if (drawPath.some(p => p.r===r && p.c===c)) return;
+
+  // Block on another color's dot
+  if (grid[r][c].dot && grid[r][c].dot !== drawColor) return;
+
+  // Clear another color's pipe
+  if (grid[r][c].pipe && grid[r][c].pipe !== drawColor) {
+    clearPipe(grid[r][c].pipe);
+  }
+
+  drawPath.push({r, c});
+  grid[r][c].pipe = drawColor;
+
+  // Reached the other endpoint?
+  if (grid[r][c].dot === drawColor && drawPath.length > 1) {
+    drawing = false;
+    completed.add(drawColor);
+    renderAll();
+    checkWin();
+    return;
+  }
+
+  renderAll();
+});
+
+boardEl.addEventListener('pointerup',     () => { drawing = false; });
+boardEl.addEventListener('pointercancel', () => { drawing = false; });
+
+function resetLevel()    { initLevel(levelIdx); }
+function changeLevel(d)  {
+  const nx = levelIdx + d;
+  if (nx >= 0 && nx < LEVELS.length) initLevel(nx);
+}
+
+initLevel(0);
+</script>
+</body>
+</html>
