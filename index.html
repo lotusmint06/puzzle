@@ -46,7 +46,7 @@ body {
 .shape:nth-child(2){width:240px;height:240px;background:var(--amber);opacity:.09;top:48%;right:-90px;animation-delay:2.5s}
 .shape:nth-child(3){width:130px;height:130px;background:var(--orange);opacity:.06;bottom:8%;left:16%;animation-delay:4.5s}
 @keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
-.wrapper{position:relative;z-index:1;width:100%;max-width:600px;display:flex;flex-direction:column;align-items:center;gap:28px}
+.wrapper{position:relative;z-index:1;width:100%;max-width:600px;display:flex;flex-direction:column;align-items:stretch;gap:36px}
 .header{display:flex;flex-direction:column;align-items:center;gap:8px;animation:fadeDown .4s ease both}
 .logo-row{display:flex;align-items:center;gap:14px}
 .logo-icon{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:56px;height:56px;background:#EDDDCA;border-radius:16px;padding:7px;box-shadow:0 5px 0 var(--shadow);flex-shrink:0}
@@ -59,14 +59,24 @@ body {
 .logo-text em{font-style:normal;color:var(--orange)}
 .subtitle{font-size:clamp(13px,3.5vw,15px);font-weight:800;color:var(--muted)}
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+.game-section{display:flex;flex-direction:column;gap:14px;animation:fadeUp .45s ease both;opacity:0}
+.game-section:nth-of-type(1){animation-delay:.12s}
+.game-section:nth-of-type(2){animation-delay:.20s}
+.game-section:nth-of-type(3){animation-delay:.28s}
+.game-section:nth-of-type(4){animation-delay:.36s}
+.game-section:nth-of-type(5){animation-delay:.44s}
+.game-section:nth-of-type(6){animation-delay:.52s}
+.section-head{display:flex;align-items:center;gap:12px;padding:0 4px}
+.section-title{font-size:clamp(20px,5.2vw,24px);font-weight:800;color:var(--fg);letter-spacing:-0.5px;line-height:1;flex-shrink:0}
+.section-count{font-size:11px;font-weight:900;color:var(--muted);background:var(--surface);border:1.5px solid var(--border);border-radius:999px;padding:3px 9px;letter-spacing:.5px;flex-shrink:0;line-height:1.4}
+.section-rule{flex:1;height:2px;border-radius:1px;background:var(--border)}
+
 .game-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%}
-.game-card{background:var(--surface);border-radius:20px;padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;box-shadow:0 6px 0 var(--shadow);border:1.5px solid var(--border);text-decoration:none;color:inherit;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;animation:fadeUp .45s ease both;position:relative}
+.game-card{background:var(--surface);border-radius:20px;padding:20px 14px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;box-shadow:0 6px 0 var(--shadow);border:1.5px solid var(--border);text-decoration:none;color:inherit;cursor:pointer;transition:transform .14s ease,box-shadow .14s ease;position:relative}
 .game-card:not(.coming-soon):hover{transform:translateY(-4px);box-shadow:0 10px 0 var(--shadow)}
 .game-card:not(.coming-soon):active{transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
 .game-card.coming-soon{opacity:.48;cursor:default}
-.game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}.game-card:nth-child(11){animation-delay:.57s}.game-card:nth-child(12){animation-delay:.62s}.game-card:nth-child(13){animation-delay:.67s}.game-card:nth-child(14){animation-delay:.72s}.game-card:nth-child(15){animation-delay:.77s}.game-card:nth-child(16){animation-delay:.82s}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.cat-pill{position:absolute;top:10px;right:10px;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--muted);border:1px solid var(--border);line-height:1.4}
 .mini-icon{width:72px;height:72px;border-radius:12px;box-shadow:0 3px 0 var(--shadow);flex-shrink:0;overflow:hidden;display:block}
 .mini-icon svg{display:block;width:100%;height:100%}
 .card-body{width:100%;text-align:center}
@@ -75,7 +85,8 @@ body {
 .play-btn{background:var(--orange);color:white;border:none;border-radius:12px;padding:11px 0;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 0 var(--orange-dk);letter-spacing:.3px;width:100%;pointer-events:none;transition:transform .1s,box-shadow .1s}
 .game-card:not(.coming-soon):active .play-btn{transform:translateY(3px);box-shadow:0 1px 0 var(--orange-dk)}
 .coming-soon .play-btn{background:var(--border);box-shadow:0 4px 0 var(--shadow);color:var(--muted)}
-.footer{font-size:12px;font-weight:700;color:var(--muted);opacity:.7;animation:fadeUp .4s .55s ease both}
+.footer{font-size:12px;font-weight:700;color:var(--muted);opacity:.7;text-align:center;animation:fadeUp .4s .65s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -90,437 +101,491 @@ body {
       </div>
       <div class="logo-text"><em>P</em>uzzle</div>
     </div>
-    <div class="subtitle">게임을 골라보세요 — 모두 무료</div>
+    <div class="subtitle">15개의 손으로 만든 퍼즐 — 모두 무료</div>
   </div>
 
-  <div class="game-grid">
+  <!-- ─── 퍼즐 ─── -->
+  <section class="game-section">
+    <div class="section-head">
+      <h2 class="section-title">퍼즐</h2>
+      <span class="section-count">5</span>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+    <div class="game-grid">
 
-    <a class="game-card" href="./2048/index.html">
-      <div class="cat-pill">숫자</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <defs><linearGradient id="g-2048" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B35"/><stop offset="55%" stop-color="#FFD93D"/><stop offset="100%" stop-color="#4DC07A"/></linearGradient></defs>
-          <rect width="64" height="64" fill="#EDDDCA"/>
-          <rect x="5" y="5" width="25" height="25" rx="5" fill="#FF9F43"/>
-          <text x="17.5" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">8</text>
-          <rect x="34" y="5" width="25" height="25" rx="5" fill="#FF6B35"/>
-          <text x="46.5" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="11" fill="white">16</text>
-          <rect x="5" y="34" width="25" height="25" rx="5" fill="#FFD93D"/>
-          <text x="17.5" y="50.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#7A5C00">128</text>
-          <rect x="34" y="34" width="25" height="25" rx="5" fill="url(#g-2048)"/>
-          <text x="46.5" y="49.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="7" fill="white">2048</text>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">2048</div><div class="card-desc">타일을 합쳐 2048을 만들어요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./puzzlepour/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="pc1"><rect x="8" y="7" width="12" height="49" rx="6"/></clipPath>
+              <clipPath id="pc2"><rect x="26" y="7" width="12" height="49" rx="6"/></clipPath>
+              <clipPath id="pc3"><rect x="44" y="7" width="12" height="49" rx="6"/></clipPath>
+            </defs>
+            <rect width="64" height="64" fill="#F5EDE0"/>
+            <rect x="7" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
+            <rect x="8" y="33" width="12" height="12" fill="#FFD93D" clip-path="url(#pc1)"/>
+            <rect x="8" y="45" width="12" height="12" fill="#FF6B6B" clip-path="url(#pc1)"/>
+            <rect x="25" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
+            <rect x="26" y="19" width="12" height="13" fill="#4D96FF" clip-path="url(#pc2)"/>
+            <rect x="26" y="32" width="12" height="13" fill="#4D96FF" clip-path="url(#pc2)"/>
+            <rect x="26" y="45" width="12" height="12" fill="#6BCB77" clip-path="url(#pc2)"/>
+            <rect x="43" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
+            <rect x="44" y="45" width="12" height="12" fill="#A78BFA" clip-path="url(#pc3)"/>
+            <rect x="9" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc1)"/>
+            <rect x="27" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc2)"/>
+            <rect x="45" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc3)"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">Puzzle Pour</div><div class="card-desc">색을 맞춰 시험관을 채워요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./snake/index.html">
-      <div class="cat-pill">아케이드</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#1E2240"/>
-          <g fill="#2A2E52"><circle cx="10" cy="10" r="1.2"/><circle cx="22" cy="10" r="1.2"/><circle cx="34" cy="10" r="1.2"/><circle cx="46" cy="10" r="1.2"/><circle cx="58" cy="10" r="1.2"/><circle cx="10" cy="22" r="1.2"/><circle cx="58" cy="22" r="1.2"/><circle cx="10" cy="34" r="1.2"/><circle cx="58" cy="34" r="1.2"/><circle cx="10" cy="46" r="1.2"/><circle cx="58" cy="46" r="1.2"/><circle cx="10" cy="58" r="1.2"/><circle cx="22" cy="58" r="1.2"/><circle cx="34" cy="58" r="1.2"/><circle cx="46" cy="58" r="1.2"/><circle cx="58" cy="58" r="1.2"/></g>
-          <rect x="22" y="40" width="12" height="12" rx="4" fill="#3D8A4D"/>
-          <rect x="22" y="26" width="12" height="12" rx="4" fill="#52B063"/>
-          <rect x="22" y="12" width="12" height="12" rx="4" fill="#6BCB77"/>
-          <rect x="36" y="12" width="12" height="12" rx="4" fill="#6BCB77"/>
-          <rect x="50" y="12" width="12" height="12" rx="5" fill="#4D96FF"/>
-          <circle cx="55" cy="16" r="2" fill="white"/>
-          <circle cx="55.8" cy="16" r="1" fill="#1E2240"/>
-          <circle cx="50" cy="50" r="7" fill="#FF5252"/>
-          <circle cx="47.5" cy="47.5" r="2.5" fill="rgba(255,255,255,0.35)"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">스네이크</div><div class="card-desc">먹이를 먹어 몸을 늘려가요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./puzzledrop/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#F0E6D3"/>
+            <rect x="27" y="15" width="10" height="10" rx="2" fill="#4D96FF"/>
+            <rect x="27" y="27" width="10" height="10" rx="2" fill="#4D96FF"/>
+            <rect x="39" y="27" width="10" height="10" rx="2" fill="#6BCB77"/>
+            <rect x="3"  y="39" width="10" height="10" rx="2" fill="#6BCB77"/>
+            <rect x="15" y="39" width="10" height="10" rx="2" fill="#6BCB77"/>
+            <rect x="27" y="39" width="10" height="10" rx="2" fill="#FF6B6B"/>
+            <rect x="39" y="39" width="10" height="10" rx="2" fill="#FF6B6B"/>
+            <rect x="51" y="39" width="10" height="10" rx="2" fill="#FFD93D"/>
+            <rect x="3"  y="51" width="10" height="10" rx="2" fill="#A78BFA"/>
+            <rect x="15" y="51" width="10" height="10" rx="2" fill="#A78BFA"/>
+            <rect x="27" y="51" width="10" height="10" rx="2" fill="#FF6B6B"/>
+            <rect x="39" y="51" width="10" height="10" rx="2" fill="#FFD93D"/>
+            <rect x="51" y="51" width="10" height="10" rx="2" fill="#FFD93D"/>
+            <rect x="3"  y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+            <rect x="15" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+            <rect x="27" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+            <rect x="39" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+            <rect x="51" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">Puzzle Drop</div><div class="card-desc">블록을 쌓아 줄을 없애요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./puzzlepour/index.html">
-      <div class="cat-pill">퍼즐</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <clipPath id="pc1"><rect x="8" y="7" width="12" height="49" rx="6"/></clipPath>
-            <clipPath id="pc2"><rect x="26" y="7" width="12" height="49" rx="6"/></clipPath>
-            <clipPath id="pc3"><rect x="44" y="7" width="12" height="49" rx="6"/></clipPath>
-          </defs>
-          <rect width="64" height="64" fill="#F5EDE0"/>
-          <rect x="7" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
-          <rect x="8" y="33" width="12" height="12" fill="#FFD93D" clip-path="url(#pc1)"/>
-          <rect x="8" y="45" width="12" height="12" fill="#FF6B6B" clip-path="url(#pc1)"/>
-          <rect x="25" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
-          <rect x="26" y="19" width="12" height="13" fill="#4D96FF" clip-path="url(#pc2)"/>
-          <rect x="26" y="32" width="12" height="13" fill="#4D96FF" clip-path="url(#pc2)"/>
-          <rect x="26" y="45" width="12" height="12" fill="#6BCB77" clip-path="url(#pc2)"/>
-          <rect x="43" y="6" width="14" height="52" rx="7" fill="#EDD8C0" stroke="#C4AA88" stroke-width="1.5"/>
-          <rect x="44" y="45" width="12" height="12" fill="#A78BFA" clip-path="url(#pc3)"/>
-          <rect x="9" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc1)"/>
-          <rect x="27" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc2)"/>
-          <rect x="45" y="8" width="4" height="40" rx="2" fill="rgba(255,255,255,0.4)" clip-path="url(#pc3)"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">Puzzle Pour</div><div class="card-desc">색을 맞춰 시험관을 채워요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./nonogram/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#F5EDE0"/>
+            <rect x="5"  y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="16" y="5"  width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="27" y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="38" y="5"  width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="49" y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="5"  y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="16" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="27" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="38" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="49" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="5"  y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="16" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="27" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="38" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="49" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="5"  y="38" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="16" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="27" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="38" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="49" y="38" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="5"  y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="16" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="27" y="49" width="10" height="10" rx="1.5" fill="#3D2810"/>
+            <rect x="38" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <rect x="49" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
+            <line x1="5" y1="16" x2="59" y2="16" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="5" y1="27" x2="59" y2="27" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="5" y1="38" x2="59" y2="38" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="5" y1="49" x2="59" y2="49" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="16" y1="5" x2="16" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="27" y1="5" x2="27" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="38" y1="5" x2="38" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+            <line x1="49" y1="5" x2="49" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">노노그램</div><div class="card-desc">힌트로 그림을 완성해요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./sudoku/index.html">
-      <div class="cat-pill">숫자</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#FFF4E6"/>
-          <rect x="3" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/>
-          <rect x="3" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/>
-          <rect x="3" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/>
-          <rect x="3" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/>
-          <rect x="2" y="2" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
-          <rect x="33" y="2" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
-          <rect x="2" y="33" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
-          <rect x="33" y="33" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
-          <text x="9.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">1</text>
-          <text x="39.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">2</text>
-          <text x="24.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">3</text>
-          <text x="54.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">4</text>
-          <text x="9.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">2</text>
-          <text x="24.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">4</text>
-          <text x="54.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">3</text>
-          <text x="9.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">4</text>
-          <text x="39.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">1</text>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">스도쿠</div><div class="card-desc">숫자를 채워 퍼즐을 완성해요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./sokoban/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#FDF5E6"/>
+            <rect x="2"  y="2"  width="60" height="60" rx="2" fill="none" stroke="#b0996e" stroke-width="2"/>
+            <rect x="8"  y="8"  width="10" height="10" fill="#b0996e"/>
+            <rect x="46" y="46" width="10" height="10" fill="#b0996e"/>
+            <circle cx="46" cy="18" r="5" fill="none" stroke="#FF9F43" stroke-width="2.5" stroke-dasharray="3 2"/>
+            <circle cx="18" cy="46" r="5" fill="none" stroke="#FF9F43" stroke-width="2.5" stroke-dasharray="3 2"/>
+            <rect x="22" y="22" width="20" height="20" rx="2" fill="#FF9F43" stroke="#c47820" stroke-width="2"/>
+            <rect x="26" y="26" width="12" height="12" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1.5"/>
+            <circle cx="32" cy="50" r="6" fill="#4D96FF" stroke="#2a70d4" stroke-width="1.5"/>
+            <circle cx="29.5" cy="49" r="1.5" fill="white"/>
+            <circle cx="34.5" cy="49" r="1.5" fill="white"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">소코반</div><div class="card-desc">상자를 밀어 동그라미에 놓아요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./puzzledrop/index.html">
-      <div class="cat-pill">퍼즐</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#F0E6D3"/>
-          <rect x="27" y="15" width="10" height="10" rx="2" fill="#4D96FF"/>
-          <rect x="27" y="27" width="10" height="10" rx="2" fill="#4D96FF"/>
-          <rect x="39" y="27" width="10" height="10" rx="2" fill="#6BCB77"/>
-          <rect x="3"  y="39" width="10" height="10" rx="2" fill="#6BCB77"/>
-          <rect x="15" y="39" width="10" height="10" rx="2" fill="#6BCB77"/>
-          <rect x="27" y="39" width="10" height="10" rx="2" fill="#FF6B6B"/>
-          <rect x="39" y="39" width="10" height="10" rx="2" fill="#FF6B6B"/>
-          <rect x="51" y="39" width="10" height="10" rx="2" fill="#FFD93D"/>
-          <rect x="3"  y="51" width="10" height="10" rx="2" fill="#A78BFA"/>
-          <rect x="15" y="51" width="10" height="10" rx="2" fill="#A78BFA"/>
-          <rect x="27" y="51" width="10" height="10" rx="2" fill="#FF6B6B"/>
-          <rect x="39" y="51" width="10" height="10" rx="2" fill="#FFD93D"/>
-          <rect x="51" y="51" width="10" height="10" rx="2" fill="#FFD93D"/>
-          <rect x="3"  y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
-          <rect x="15" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
-          <rect x="27" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
-          <rect x="39" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
-          <rect x="51" y="49" width="10" height="3" rx="1" fill="rgba(0,0,0,0.12)"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">Puzzle Drop</div><div class="card-desc">블록을 쌓아 줄을 없애요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./hanoi/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#FFF7E5"/>
+            <rect x="3" y="51" width="58" height="6" rx="2" fill="#8b6914"/>
+            <rect x="3" y="51" width="58" height="2" rx="1" fill="rgba(255,255,255,.3)"/>
+            <rect x="11"   y="12" width="3" height="42" rx="1.5" fill="#7a5b1c"/>
+            <rect x="30.5" y="12" width="3" height="42" rx="1.5" fill="#7a5b1c"/>
+            <rect x="50"   y="12" width="3" height="42" rx="1.5" fill="#7a5b1c"/>
+            <rect x="2"  y="44" width="21" height="6" rx="3" fill="#FF5252"/>
+            <rect x="4"  y="37" width="17" height="6" rx="3" fill="#FF9F43"/>
+            <rect x="6"  y="30" width="13" height="6" rx="3" fill="#FFD93D"/>
+            <rect x="8"  y="23" width="9"  height="6" rx="3" fill="#6BCB77"/>
+            <rect x="26" y="44" width="13" height="6" rx="3" fill="#4D96FF"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">하노이 탑</div><div class="card-desc">디스크를 옮겨 탑을 만들어요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./minesweeper/index.html">
-      <div class="cat-pill">전략</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#F0E6D3"/>
-          <rect x="3"  y="3"  width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="3"  width="13" height="6" rx="3" fill="#EAE0CC"/>
-          <rect x="18" y="3"  width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="18" y="3"  width="13" height="6" rx="3" fill="#EAE0CC"/>
-          <rect x="3"  y="33" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="33" width="13" height="6" rx="3" fill="#EAE0CC"/>
-          <rect x="3"  y="48" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="48" width="13" height="6" rx="3" fill="#EAE0CC"/>
-          <rect x="18" y="48" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="18" y="48" width="13" height="6" rx="3" fill="#EAE0CC"/>
-          <rect x="33" y="3"  width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="48" y="3"  width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="18" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="33" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="48" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="18" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="33" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="48" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="33" y="48" width="13" height="13" rx="3" fill="#F8F0E4"/>
-          <rect x="3"  y="18" width="13" height="13" rx="3" fill="#FFF4E6"/>
-          <rect x="48" y="48" width="13" height="13" rx="3" fill="#FF6B6B"/>
-          <text x="39.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
-          <text x="54.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#6BCB77">2</text>
-          <text x="24.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
-          <text x="54.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
-          <text x="24.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#6BCB77">2</text>
-          <text x="39.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
-          <text x="39.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#FF5252">3</text>
-          <rect x="8" y="19" width="2" height="9" rx="1" fill="#8B6040"/>
-          <polygon points="10,19 10,24 15,21.5" fill="#FF4444"/>
-          <circle cx="54.5" cy="54.5" r="4" fill="#2C1A00"/>
-          <line x1="54.5" y1="49" x2="54.5" y2="60" stroke="#2C1A00" stroke-width="1.5"/>
-          <line x1="49" y1="54.5" x2="60" y2="54.5" stroke="#2C1A00" stroke-width="1.5"/>
-          <line x1="51" y1="51" x2="58" y2="58" stroke="#2C1A00" stroke-width="1.5"/>
-          <line x1="58" y1="51" x2="51" y2="58" stroke="#2C1A00" stroke-width="1.5"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">지뢰찾기</div><div class="card-desc">폭탄을 피해 칸을 열어가요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+    </div>
+  </section>
 
-    <a class="game-card" href="./baseball/index.html">
-      <div class="cat-pill">추리</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#1E2A4A"/>
-          <text x="32" y="13" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="7.5" fill="#6A88B8" letter-spacing="1">숫자야구</text>
-          <rect x="5" y="19" width="16" height="16" rx="4" fill="#4D96FF"/>
-          <text x="13" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">3</text>
-          <rect x="24" y="19" width="16" height="16" rx="4" fill="#6BCB77"/>
-          <text x="32" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">7</text>
-          <rect x="43" y="19" width="16" height="16" rx="4" fill="#3A4A6A"/>
-          <text x="51" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="#7A8AAA">5</text>
-          <rect x="5"  y="40" width="16" height="10" rx="3" fill="#2A3A5A"/>
-          <text x="13" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#4D96FF">1S</text>
-          <rect x="24" y="40" width="16" height="10" rx="3" fill="#2A3A5A"/>
-          <text x="32" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#6BCB77">1B</text>
-          <rect x="43" y="40" width="16" height="10" rx="3" fill="#2A3A5A"/>
-          <text x="51" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#5A6A8A">0O</text>
-          <circle cx="22" cy="59" r="3" fill="#4D96FF"/>
-          <circle cx="32" cy="59" r="3" fill="#4D96FF"/>
-          <circle cx="42" cy="59" r="3" fill="#2A3A5A"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">숫자 야구</div><div class="card-desc">숨겨진 숫자를 추리해요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+  <!-- ─── 아케이드 ─── -->
+  <section class="game-section">
+    <div class="section-head">
+      <h2 class="section-title">아케이드</h2>
+      <span class="section-count">4</span>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+    <div class="game-grid">
 
-    <a class="game-card" href="./connectfour/index.html">
-      <div class="cat-pill">전략</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#C4880A"/>
-          <circle cx="8"  cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="20" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="32" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="44" cy="14" r="5" fill="#FF5252"/>
-          <circle cx="56" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="8"  cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="20" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="32" cy="26" r="5" fill="#FF5252"/>
-          <circle cx="44" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="56" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="8"  cy="38" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="20" cy="38" r="5" fill="#FF5252"/>
-          <circle cx="32" cy="38" r="5" fill="#FFD93D"/>
-          <circle cx="44" cy="38" r="5" fill="#FFD93D"/>
-          <circle cx="56" cy="38" r="5" fill="rgba(0,0,0,0.3)"/>
-          <circle cx="8"  cy="50" r="5" fill="#FF5252"/>
-          <circle cx="20" cy="50" r="5" fill="#FFD93D"/>
-          <circle cx="32" cy="50" r="5" fill="#FFD93D"/>
-          <circle cx="44" cy="50" r="5" fill="#FFD93D"/>
-          <circle cx="56" cy="50" r="5" fill="#FFD93D"/>
-          <circle cx="42.5" cy="12.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
-          <circle cx="30.5" cy="24.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
-          <circle cx="18.5" cy="36.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
-          <circle cx="6.5"  cy="48.5" r="1.5" fill="rgba(255,255,255,0.3)"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">사목</div><div class="card-desc">4개를 먼저 연결하면 승리!</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./snake/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#EDF2E0"/>
+            <g fill="#C8BC9A"><circle cx="10" cy="10" r="1.2"/><circle cx="22" cy="10" r="1.2"/><circle cx="34" cy="10" r="1.2"/><circle cx="46" cy="10" r="1.2"/><circle cx="58" cy="10" r="1.2"/><circle cx="10" cy="22" r="1.2"/><circle cx="58" cy="22" r="1.2"/><circle cx="10" cy="34" r="1.2"/><circle cx="58" cy="34" r="1.2"/><circle cx="10" cy="46" r="1.2"/><circle cx="58" cy="46" r="1.2"/><circle cx="10" cy="58" r="1.2"/><circle cx="22" cy="58" r="1.2"/><circle cx="34" cy="58" r="1.2"/><circle cx="46" cy="58" r="1.2"/><circle cx="58" cy="58" r="1.2"/></g>
+            <rect x="22" y="40" width="12" height="12" rx="4" fill="#3D8A4D"/>
+            <rect x="22" y="26" width="12" height="12" rx="4" fill="#52B063"/>
+            <rect x="22" y="12" width="12" height="12" rx="4" fill="#6BCB77"/>
+            <rect x="36" y="12" width="12" height="12" rx="4" fill="#6BCB77"/>
+            <rect x="50" y="12" width="12" height="12" rx="5" fill="#4D96FF"/>
+            <circle cx="55" cy="16" r="2" fill="white"/>
+            <circle cx="55.8" cy="16" r="1" fill="#2C1A00"/>
+            <circle cx="50" cy="50" r="7" fill="#FF5252"/>
+            <circle cx="47.5" cy="47.5" r="2.5" fill="rgba(255,255,255,0.5)"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">스네이크</div><div class="card-desc">먹이를 먹어 몸을 늘려가요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./wordle/index.html">
-      <div class="cat-pill">단어</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#1E2A1E"/>
-          <rect x="3"  y="9"  width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="15" y="9"  width="10" height="10" rx="2" fill="#4A3A30"/>
-          <rect x="27" y="9"  width="10" height="10" rx="2" fill="#C8A020"/>
-          <rect x="39" y="9"  width="10" height="10" rx="2" fill="#4A3A30"/>
-          <rect x="51" y="9"  width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="3"  y="21" width="10" height="10" rx="2" fill="#4A3A30"/>
-          <rect x="15" y="21" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="27" y="21" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="39" y="21" width="10" height="10" rx="2" fill="#4A3A30"/>
-          <rect x="51" y="21" width="10" height="10" rx="2" fill="#C8A020"/>
-          <rect x="3"  y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="15" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="27" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="39" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="51" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
-          <rect x="3"  y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
-          <rect x="15" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
-          <rect x="27" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
-          <rect x="39" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
-          <rect x="51" y="45" width="10" height="10" rx="2" fill="none" stroke="#3A4A3A" stroke-width="1.5"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">워들</div><div class="card-desc">5글자 단어를 맞춰보세요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./breakout/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#FDF5E6"/>
+            <rect x="3"  y="6"  width="14" height="6" rx="1.2" fill="#FF5252"/>
+            <rect x="19" y="6"  width="14" height="6" rx="1.2" fill="#FF9F43"/>
+            <rect x="35" y="6"  width="14" height="6" rx="1.2" fill="#FFD93D"/>
+            <rect x="3"  y="14" width="14" height="6" rx="1.2" fill="#6BCB77"/>
+            <rect x="19" y="14" width="14" height="6" rx="1.2" fill="#4D96FF"/>
+            <rect x="35" y="14" width="14" height="6" rx="1.2" fill="#A78BFA"/>
+            <rect x="3"  y="22" width="14" height="6" rx="1.2" fill="#FF5252" opacity="0.5"/>
+            <circle cx="40" cy="40" r="5" fill="#FFD93D" stroke="#c4a000" stroke-width="0.8"/>
+            <circle cx="38.5" cy="38.5" r="1.5" fill="white" opacity="0.7"/>
+            <rect x="22" y="52" width="22" height="5" rx="2.5" fill="#5a3e1b"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">벽돌깨기</div><div class="card-desc">공으로 벽돌을 모두 깨요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./nonogram/index.html">
-      <div class="cat-pill">퍼즐</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#F5EDE0"/>
-          <rect x="5"  y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="16" y="5"  width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="27" y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="38" y="5"  width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="49" y="5"  width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="5"  y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="16" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="27" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="38" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="49" y="16" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="5"  y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="16" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="27" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="38" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="49" y="27" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="5"  y="38" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="16" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="27" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="38" y="38" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="49" y="38" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="5"  y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="16" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="27" y="49" width="10" height="10" rx="1.5" fill="#3D2810"/>
-          <rect x="38" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <rect x="49" y="49" width="10" height="10" rx="1.5" fill="#E4D2BB"/>
-          <line x1="5" y1="16" x2="59" y2="16" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="5" y1="27" x2="59" y2="27" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="5" y1="38" x2="59" y2="38" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="5" y1="49" x2="59" y2="49" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="16" y1="5" x2="16" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="27" y1="5" x2="27" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="38" y1="5" x2="38" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
-          <line x1="49" y1="5" x2="49" y2="59" stroke="#D4C0A0" stroke-width="0.5"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">노노그램</div><div class="card-desc">힌트로 그림을 완성해요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./bubbles/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#FBF3E5"/>
+            <circle cx="8"  cy="10" r="7" fill="#FF5252"/><circle cx="5.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="22" cy="10" r="7" fill="#FFD93D"/><circle cx="19.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="36" cy="10" r="7" fill="#6BCB77"/><circle cx="33.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="50" cy="10" r="7" fill="#4D96FF"/><circle cx="47.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="15" cy="23" r="7" fill="#FF5252"/><circle cx="12.5" cy="20.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="29" cy="23" r="7" fill="#FF5252"/><circle cx="26.5" cy="20.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="43" cy="23" r="7" fill="#A78BFA"/><circle cx="40.5" cy="20.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="8"  cy="36" r="7" fill="#6BCB77"/><circle cx="5.5" cy="33.5" r="2.5" fill="rgba(255,255,255,.5)"/>
+            <circle cx="22" cy="36" r="7" fill="#FFD93D"/>
+            <circle cx="36" cy="36" r="7" fill="#6BCB77"/>
+            <circle cx="32" cy="56" r="6" fill="#FF9F43"/>
+            <polygon points="32,44 26,54 38,54" fill="rgba(196,120,32,0.55)"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">버블 팝</div><div class="card-desc">같은 색 버블을 터뜨려요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
+      <a class="game-card" href="./whackmole/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#7BC57A"/>
+            <circle cx="12" cy="10" r="1.2" fill="rgba(255,255,255,.45)"/>
+            <circle cx="52" cy="14" r="1"   fill="rgba(255,255,255,.45)"/>
+            <ellipse cx="32" cy="56" rx="25" ry="6" fill="#3a2a04"/>
+            <ellipse cx="32" cy="54" rx="20" ry="3" fill="#1a1004"/>
+            <ellipse cx="20" cy="29" rx="5"  ry="4"  fill="#5a3924"/>
+            <ellipse cx="44" cy="29" rx="5"  ry="4"  fill="#5a3924"/>
+            <ellipse cx="20" cy="29" rx="2.5" ry="2" fill="#FFB5B5"/>
+            <ellipse cx="44" cy="29" rx="2.5" ry="2" fill="#FFB5B5"/>
+            <ellipse cx="32" cy="40" rx="20" ry="18" fill="#8B5A3C"/>
+            <ellipse cx="32" cy="46" rx="11" ry="9"  fill="#A87852"/>
+            <ellipse cx="26" cy="36" rx="2.4" ry="2.9" fill="#222"/>
+            <ellipse cx="38" cy="36" rx="2.4" ry="2.9" fill="#222"/>
+            <circle  cx="25.2" cy="35" r="0.9" fill="white"/>
+            <circle  cx="37.2" cy="35" r="0.9" fill="white"/>
+            <ellipse cx="32" cy="43" rx="2.4" ry="1.8" fill="#FF8888"/>
+            <path d="M 28 50 Q 32 53 36 50" stroke="#5a3924" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <ellipse cx="32" cy="60" rx="27" ry="5" fill="#8b6914"/>
+            <ellipse cx="32" cy="58.5" rx="24" ry="1.5" fill="rgba(255,255,255,.22)"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">두더지 잡기</div><div class="card-desc">튀어나오는 두더지를 빨리 잡아요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./sokoban/index.html">
-      <div class="cat-pill">퍼즐</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#FDF5E6"/>
-          <rect x="2"  y="2"  width="60" height="60" rx="2" fill="none" stroke="#b0996e" stroke-width="2"/>
-          <rect x="8"  y="8"  width="10" height="10" fill="#b0996e"/>
-          <rect x="46" y="46" width="10" height="10" fill="#b0996e"/>
-          <circle cx="46" cy="18" r="5" fill="none" stroke="#FF9F43" stroke-width="2.5" stroke-dasharray="3 2"/>
-          <circle cx="18" cy="46" r="5" fill="none" stroke="#FF9F43" stroke-width="2.5" stroke-dasharray="3 2"/>
-          <rect x="22" y="22" width="20" height="20" rx="2" fill="#FF9F43" stroke="#c47820" stroke-width="2"/>
-          <rect x="26" y="26" width="12" height="12" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1.5"/>
-          <circle cx="32" cy="50" r="6" fill="#4D96FF" stroke="#2a70d4" stroke-width="1.5"/>
-          <circle cx="29.5" cy="49" r="1.5" fill="white"/>
-          <circle cx="34.5" cy="49" r="1.5" fill="white"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">소코반</div><div class="card-desc">상자를 밀어 동그라미에 놓아요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+    </div>
+  </section>
 
-    <a class="game-card" href="./breakout/index.html">
-      <div class="cat-pill">아케이드</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#FDF5E6"/>
-          <rect x="3"  y="6"  width="14" height="6" rx="1.2" fill="#FF5252"/>
-          <rect x="19" y="6"  width="14" height="6" rx="1.2" fill="#FF9F43"/>
-          <rect x="35" y="6"  width="14" height="6" rx="1.2" fill="#FFD93D"/>
-          <rect x="3"  y="14" width="14" height="6" rx="1.2" fill="#6BCB77"/>
-          <rect x="19" y="14" width="14" height="6" rx="1.2" fill="#4D96FF"/>
-          <rect x="35" y="14" width="14" height="6" rx="1.2" fill="#A78BFA"/>
-          <rect x="3"  y="22" width="14" height="6" rx="1.2" fill="#FF5252" opacity="0.5"/>
-          <circle cx="40" cy="40" r="5" fill="#FFD93D" stroke="#c4a000" stroke-width="0.8"/>
-          <circle cx="38.5" cy="38.5" r="1.5" fill="white" opacity="0.7"/>
-          <rect x="22" y="52" width="22" height="5" rx="2.5" fill="#5a3e1b"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">벽돌깨기</div><div class="card-desc">공으로 벽돌을 모두 깨요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+  <!-- ─── 숫자 ─── -->
+  <section class="game-section">
+    <div class="section-head">
+      <h2 class="section-title">숫자</h2>
+      <span class="section-count">2</span>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+    <div class="game-grid">
 
-    <a class="game-card" href="./whackmole/index.html">
-      <div class="cat-pill">아케이드</div>
-      <div class="mini-icon">
-        <svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
-          <rect width="72" height="72" fill="#7BC57A"/>
-          <circle cx="14" cy="12" r="1.5" fill="rgba(255,255,255,.4)"/>
-          <circle cx="58" cy="20" r="1.2" fill="rgba(255,255,255,.4)"/>
-          <circle cx="22" cy="58" r="1.2" fill="rgba(0,0,0,.06)"/>
-          <ellipse cx="36" cy="62" rx="28" ry="6" fill="#3a2a04"/>
-          <ellipse cx="36" cy="60" rx="24" ry="4" fill="#5a4408"/>
-          <ellipse cx="22" cy="34" rx="5.5" ry="4.5" fill="#5a3924"/>
-          <ellipse cx="50" cy="34" rx="5.5" ry="4.5" fill="#5a3924"/>
-          <ellipse cx="22" cy="34" rx="3" ry="2.2" fill="#FFB5B5"/>
-          <ellipse cx="50" cy="34" rx="3" ry="2.2" fill="#FFB5B5"/>
-          <ellipse cx="36" cy="46" rx="22" ry="20" fill="#8B5A3C"/>
-          <ellipse cx="36" cy="52" rx="12" ry="10" fill="#A87852"/>
-          <ellipse cx="29" cy="42" rx="2.6" ry="3.2" fill="#222"/>
-          <ellipse cx="43" cy="42" rx="2.6" ry="3.2" fill="#222"/>
-          <circle cx="28" cy="40.5" r="0.9" fill="white"/>
-          <circle cx="42" cy="40.5" r="0.9" fill="white"/>
-          <ellipse cx="36" cy="49" rx="2.6" ry="2" fill="#FF8888"/>
-          <path d="M 32 56 Q 36 59 40 56" stroke="#5a3924" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">두더지 잡기</div><div class="card-desc">튀어나오는 두더지를 빨리 잡아요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./2048/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="g-2048" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B35"/><stop offset="55%" stop-color="#FFD93D"/><stop offset="100%" stop-color="#4DC07A"/></linearGradient></defs>
+            <rect width="64" height="64" fill="#EDDDCA"/>
+            <rect x="5" y="5" width="25" height="25" rx="5" fill="#FF9F43"/>
+            <text x="17.5" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">8</text>
+            <rect x="34" y="5" width="25" height="25" rx="5" fill="#FF6B35"/>
+            <text x="46.5" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="11" fill="white">16</text>
+            <rect x="5" y="34" width="25" height="25" rx="5" fill="#FFD93D"/>
+            <text x="17.5" y="50.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#7A5C00">128</text>
+            <rect x="34" y="34" width="25" height="25" rx="5" fill="url(#g-2048)"/>
+            <text x="46.5" y="49.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="7" fill="white">2048</text>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">2048</div><div class="card-desc">타일을 합쳐 2048을 만들어요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./hanoi/index.html">
-      <div class="cat-pill">퍼즐</div>
-      <div class="mini-icon">
-        <svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
-          <rect width="72" height="72" fill="#FFF7E5"/>
-          <rect x="4" y="58" width="64" height="7" rx="2" fill="#8b6914"/>
-          <rect x="4" y="58" width="64" height="2" rx="1" fill="rgba(255,255,255,.35)"/>
-          <rect x="13" y="14" width="3"  height="46" rx="1.5" fill="#7a5b1c"/>
-          <rect x="34.5" y="14" width="3" height="46" rx="1.5" fill="#7a5b1c"/>
-          <rect x="56" y="14" width="3"  height="46" rx="1.5" fill="#7a5b1c"/>
-          <rect x="3"  y="50" width="23" height="6" rx="3" fill="#FF5252"/>
-          <rect x="5"  y="43" width="19" height="6" rx="3" fill="#FF9F43"/>
-          <rect x="7"  y="36" width="15" height="6" rx="3" fill="#FFD93D"/>
-          <rect x="9"  y="29" width="11" height="6" rx="3" fill="#6BCB77"/>
-          <rect x="29" y="50" width="13" height="6" rx="3" fill="#4D96FF"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">하노이 탑</div><div class="card-desc">디스크를 옮겨 탑을 만들어요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+      <a class="game-card" href="./sudoku/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#FFF4E6"/>
+            <rect x="3" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="3" width="13" height="13" rx="2" fill="#F5E8D0"/>
+            <rect x="3" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="18" width="13" height="13" rx="2" fill="#F5E8D0"/>
+            <rect x="3" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="33" width="13" height="13" rx="2" fill="#F5E8D0"/>
+            <rect x="3" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="18" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="33" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/><rect x="48" y="48" width="13" height="13" rx="2" fill="#F5E8D0"/>
+            <rect x="2" y="2" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+            <rect x="33" y="2" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+            <rect x="2" y="33" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+            <rect x="33" y="33" width="29" height="29" rx="3" fill="none" stroke="#C8A878" stroke-width="2"/>
+            <text x="9.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">1</text>
+            <text x="39.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">2</text>
+            <text x="24.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">3</text>
+            <text x="54.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">4</text>
+            <text x="9.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#6B4C20">2</text>
+            <text x="24.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">4</text>
+            <text x="54.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">3</text>
+            <text x="9.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">4</text>
+            <text x="39.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="10" fill="#4D96FF">1</text>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">스도쿠</div><div class="card-desc">숫자를 채워 퍼즐을 완성해요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
 
-    <a class="game-card" href="./bubbles/index.html">
-      <div class="cat-pill">아케이드</div>
-      <div class="mini-icon">
-        <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-          <rect width="64" height="64" fill="#0f0f2e"/>
-          <circle cx="8"  cy="10" r="7" fill="#FF5252"/><circle cx="5.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="22" cy="10" r="7" fill="#FFD93D"/><circle cx="19.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="36" cy="10" r="7" fill="#6BCB77"/><circle cx="33.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="50" cy="10" r="7" fill="#4D96FF"/><circle cx="47.5" cy="7.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="15" cy="23" r="7" fill="#FF5252"/><circle cx="12.5" cy="20.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="29" cy="23" r="7" fill="#FF5252"/><circle cx="26.5" cy="20.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="43" cy="23" r="7" fill="#A78BFA"/><circle cx="40.5" cy="20.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="8"  cy="36" r="7" fill="#6BCB77"/><circle cx="5.5" cy="33.5" r="2.5" fill="rgba(255,255,255,.35)"/>
-          <circle cx="22" cy="36" r="7" fill="#FFD93D"/>
-          <circle cx="36" cy="36" r="7" fill="#6BCB77"/>
-          <circle cx="32" cy="56" r="6" fill="#FF9F43"/>
-          <polygon points="32,44 26,54 38,54" fill="rgba(255,255,255,0.6)"/>
-        </svg>
-      </div>
-      <div class="card-body"><div class="card-title">버블 팝</div><div class="card-desc">같은 색 버블을 터뜨려요</div></div>
-      <button class="play-btn">▶ 플레이</button>
-    </a>
+    </div>
+  </section>
 
-  </div>
+  <!-- ─── 전략 ─── -->
+  <section class="game-section">
+    <div class="section-head">
+      <h2 class="section-title">전략</h2>
+      <span class="section-count">2</span>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+    <div class="game-grid">
+
+      <a class="game-card" href="./minesweeper/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#F0E6D3"/>
+            <rect x="3"  y="3"  width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="3"  width="13" height="6" rx="3" fill="#EAE0CC"/>
+            <rect x="18" y="3"  width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="18" y="3"  width="13" height="6" rx="3" fill="#EAE0CC"/>
+            <rect x="3"  y="33" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="33" width="13" height="6" rx="3" fill="#EAE0CC"/>
+            <rect x="3"  y="48" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="3"  y="48" width="13" height="6" rx="3" fill="#EAE0CC"/>
+            <rect x="18" y="48" width="13" height="13" rx="3" fill="#DDD0B8"/><rect x="18" y="48" width="13" height="6" rx="3" fill="#EAE0CC"/>
+            <rect x="33" y="3"  width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="48" y="3"  width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="18" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="33" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="48" y="18" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="18" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="33" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="48" y="33" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="33" y="48" width="13" height="13" rx="3" fill="#F8F0E4"/>
+            <rect x="3"  y="18" width="13" height="13" rx="3" fill="#FFF4E6"/>
+            <rect x="48" y="48" width="13" height="13" rx="3" fill="#FF6B6B"/>
+            <text x="39.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+            <text x="54.5" y="13.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#6BCB77">2</text>
+            <text x="24.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+            <text x="54.5" y="28.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+            <text x="24.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#6BCB77">2</text>
+            <text x="39.5" y="43.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#4D96FF">1</text>
+            <text x="39.5" y="58.5" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="9" fill="#FF5252">3</text>
+            <rect x="8" y="19" width="2" height="9" rx="1" fill="#8B6040"/>
+            <polygon points="10,19 10,24 15,21.5" fill="#FF4444"/>
+            <circle cx="54.5" cy="54.5" r="4" fill="#2C1A00"/>
+            <line x1="54.5" y1="49" x2="54.5" y2="60" stroke="#2C1A00" stroke-width="1.5"/>
+            <line x1="49" y1="54.5" x2="60" y2="54.5" stroke="#2C1A00" stroke-width="1.5"/>
+            <line x1="51" y1="51" x2="58" y2="58" stroke="#2C1A00" stroke-width="1.5"/>
+            <line x1="58" y1="51" x2="51" y2="58" stroke="#2C1A00" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">지뢰찾기</div><div class="card-desc">폭탄을 피해 칸을 열어가요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
+
+      <a class="game-card" href="./connectfour/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#C4880A"/>
+            <circle cx="8"  cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="20" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="32" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="44" cy="14" r="5" fill="#FF5252"/>
+            <circle cx="56" cy="14" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="8"  cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="20" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="32" cy="26" r="5" fill="#FF5252"/>
+            <circle cx="44" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="56" cy="26" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="8"  cy="38" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="20" cy="38" r="5" fill="#FF5252"/>
+            <circle cx="32" cy="38" r="5" fill="#FFD93D"/>
+            <circle cx="44" cy="38" r="5" fill="#FFD93D"/>
+            <circle cx="56" cy="38" r="5" fill="rgba(0,0,0,0.3)"/>
+            <circle cx="8"  cy="50" r="5" fill="#FF5252"/>
+            <circle cx="20" cy="50" r="5" fill="#FFD93D"/>
+            <circle cx="32" cy="50" r="5" fill="#FFD93D"/>
+            <circle cx="44" cy="50" r="5" fill="#FFD93D"/>
+            <circle cx="56" cy="50" r="5" fill="#FFD93D"/>
+            <circle cx="42.5" cy="12.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="30.5" cy="24.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="18.5" cy="36.5" r="1.5" fill="rgba(255,255,255,0.4)"/>
+            <circle cx="6.5"  cy="48.5" r="1.5" fill="rgba(255,255,255,0.3)"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">사목</div><div class="card-desc">4개를 먼저 연결하면 승리!</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ─── 추리 ─── -->
+  <section class="game-section">
+    <div class="section-head">
+      <h2 class="section-title">추리</h2>
+      <span class="section-count">1</span>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+    <div class="game-grid">
+
+      <a class="game-card" href="./baseball/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#F0E6D3"/>
+            <text x="32" y="13" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="800" font-size="7.5" fill="#9E8060" letter-spacing="1">숫자야구</text>
+            <rect x="5" y="19" width="16" height="16" rx="4" fill="#4D96FF"/>
+            <text x="13" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">3</text>
+            <rect x="24" y="19" width="16" height="16" rx="4" fill="#6BCB77"/>
+            <text x="32" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="white">7</text>
+            <rect x="43" y="19" width="16" height="16" rx="4" fill="#E4D4B8"/>
+            <text x="51" y="31" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="13" fill="#B89A72">5</text>
+            <rect x="5"  y="40" width="16" height="10" rx="3" fill="#FBF3E5" stroke="#D4C0A0" stroke-width="1"/>
+            <text x="13" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#4D96FF">1S</text>
+            <rect x="24" y="40" width="16" height="10" rx="3" fill="#FBF3E5" stroke="#D4C0A0" stroke-width="1"/>
+            <text x="32" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#3D9558">1B</text>
+            <rect x="43" y="40" width="16" height="10" rx="3" fill="#FBF3E5" stroke="#D4C0A0" stroke-width="1"/>
+            <text x="51" y="49" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="8" fill="#B89A72">0O</text>
+            <circle cx="22" cy="59" r="3" fill="#4D96FF"/>
+            <circle cx="32" cy="59" r="3" fill="#4D96FF"/>
+            <circle cx="42" cy="59" r="3" fill="#E0CCAF"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">숫자 야구</div><div class="card-desc">숨겨진 숫자를 추리해요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ─── 단어 ─── -->
+  <section class="game-section">
+    <div class="section-head">
+      <h2 class="section-title">단어</h2>
+      <span class="section-count">1</span>
+      <span class="section-rule" aria-hidden="true"></span>
+    </div>
+    <div class="game-grid">
+
+      <a class="game-card" href="./wordle/index.html">
+        <div class="mini-icon">
+          <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" fill="#FBF3E5"/>
+            <rect x="3"  y="9"  width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="15" y="9"  width="10" height="10" rx="2" fill="#D4C0A0"/>
+            <rect x="27" y="9"  width="10" height="10" rx="2" fill="#FFB830"/>
+            <rect x="39" y="9"  width="10" height="10" rx="2" fill="#D4C0A0"/>
+            <rect x="51" y="9"  width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="3"  y="21" width="10" height="10" rx="2" fill="#D4C0A0"/>
+            <rect x="15" y="21" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="27" y="21" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="39" y="21" width="10" height="10" rx="2" fill="#D4C0A0"/>
+            <rect x="51" y="21" width="10" height="10" rx="2" fill="#FFB830"/>
+            <rect x="3"  y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="15" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="27" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="39" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="51" y="33" width="10" height="10" rx="2" fill="#4DC07A"/>
+            <rect x="3"  y="45" width="10" height="10" rx="2" fill="none" stroke="#D4C0A0" stroke-width="1.5"/>
+            <rect x="15" y="45" width="10" height="10" rx="2" fill="none" stroke="#D4C0A0" stroke-width="1.5"/>
+            <rect x="27" y="45" width="10" height="10" rx="2" fill="none" stroke="#D4C0A0" stroke-width="1.5"/>
+            <rect x="39" y="45" width="10" height="10" rx="2" fill="none" stroke="#D4C0A0" stroke-width="1.5"/>
+            <rect x="51" y="45" width="10" height="10" rx="2" fill="none" stroke="#D4C0A0" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="card-body"><div class="card-title">워들</div><div class="card-desc">5글자 단어를 맞춰보세요</div></div>
+        <button class="play-btn">▶ 플레이</button>
+      </a>
+
+    </div>
+  </section>
+
   <div class="footer">더 많은 게임이 추가될 예정이에요</div>
 </div>
 <script src="./assets/sfx.js"></script>
 <script>
   document.querySelectorAll('.game-card').forEach(c => {
-    c.addEventListener('pointerdown', () => SFX.tap());
+    c.addEventListener('pointerdown', () => { if (window.SFX) SFX.tap(); });
   });
 </script>
 </body>
