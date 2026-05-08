@@ -2,8 +2,11 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Puzzle Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>퍼즐 모음 🎮</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -50,7 +53,7 @@ body {
 .game-card:not(.coming-soon):hover{transform:translateY(-4px);box-shadow:0 10px 0 var(--shadow)}
 .game-card:not(.coming-soon):active{transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
 .game-card.coming-soon{opacity:.48;cursor:default}
-.game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}
+.game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}.game-card:nth-child(11){animation-delay:.57s}.game-card:nth-child(12){animation-delay:.62s}.game-card:nth-child(13){animation-delay:.67s}.game-card:nth-child(14){animation-delay:.72s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .cat-pill{position:absolute;top:10px;right:10px;font-size:9px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--muted);border:1px solid var(--border);line-height:1.4}
 .mini-icon{width:64px;height:64px;border-radius:10px;box-shadow:0 3px 0 var(--shadow);flex-shrink:0;overflow:hidden;display:block}
@@ -406,19 +409,24 @@ body {
       <button class="play-btn">▶ 플레이</button>
     </a>
 
-    <a class="game-card" href="./tangram/index.html">
-      <div class="cat-pill">퍼즐</div>
+    <a class="game-card" href="./breakout/index.html">
+      <div class="cat-pill">아케이드</div>
       <div class="mini-icon">
         <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
           <rect width="64" height="64" fill="#FDF5E6"/>
-          <polygon points="6,6 32,6 6,32" fill="#FF5252"/>
-          <polygon points="32,6 58,6 58,32" fill="#4D96FF"/>
-          <polygon points="6,32 32,32 32,58 6,58" fill="#FFD93D"/>
-          <polygon points="58,32 58,58 32,58" fill="#6BCB77"/>
-          <polygon points="32,32 45,45 32,58 19,45" fill="#FF9F43" stroke="#c47820" stroke-width="0.5"/>
+          <rect x="3"  y="6"  width="14" height="6" rx="1.2" fill="#FF5252"/>
+          <rect x="19" y="6"  width="14" height="6" rx="1.2" fill="#FF9F43"/>
+          <rect x="35" y="6"  width="14" height="6" rx="1.2" fill="#FFD93D"/>
+          <rect x="3"  y="14" width="14" height="6" rx="1.2" fill="#6BCB77"/>
+          <rect x="19" y="14" width="14" height="6" rx="1.2" fill="#4D96FF"/>
+          <rect x="35" y="14" width="14" height="6" rx="1.2" fill="#A78BFA"/>
+          <rect x="3"  y="22" width="14" height="6" rx="1.2" fill="#FF5252" opacity="0.5"/>
+          <circle cx="40" cy="40" r="5" fill="#FFD93D" stroke="#c4a000" stroke-width="0.8"/>
+          <circle cx="38.5" cy="38.5" r="1.5" fill="white" opacity="0.7"/>
+          <rect x="22" y="52" width="22" height="5" rx="2.5" fill="#5a3e1b"/>
         </svg>
       </div>
-      <div class="card-body"><div class="card-title">탱그램</div><div class="card-desc">조각을 맞춰 모양을 만들어요</div></div>
+      <div class="card-body"><div class="card-title">벽돌깨기</div><div class="card-desc">공으로 벽돌을 모두 깨요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 

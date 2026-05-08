@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>벽돌깨기 🧱</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff9f0;--board-bg:#f0e6d3;--floor:#fdf5e6;--text:#5a3e1b;--muted:#b0996e}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+  overflow:hidden;
+}
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.09;animation:floatShape 8s ease-in-out infinite}
+.shape:nth-child(1){width:220px;height:220px;background:#FF5252;top:-60px;left:-60px}
+.shape:nth-child(2){width:160px;height:160px;background:#4D96FF;top:55%;right:-40px;animation-delay:2s}
+.shape:nth-child(3){width:110px;height:110px;background:#FFD93D;bottom:-30px;left:30%;animation-delay:4s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+.wrapper{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:440px}
+.header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.title{font-size:clamp(28px,8vw,40px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,#FF5252 0%,#FFD93D 50%,#4D96FF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,0.07))}
+.btn{background:#e8d8c0;color:#8b6914;border:none;border-radius:10px;padding:8px 13px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 3px 0 #d4c2a8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d4c2a8}
+.btn.blue{background:#4D96FF;color:white;box-shadow:0 3px 0 #2a70d4}
+.btn.blue:active{box-shadow:0 1px 0 #2a70d4}
+
+.score-row{display:flex;gap:6px;width:100%}
+.score-box{flex:1;background:var(--board-bg);border-radius:12px;padding:6px 8px;text-align:center;
+  box-shadow:0 3px 0 #d4c2a8}
+.score-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.score-val{font-size:20px;font-weight:900;color:var(--text);line-height:1.1}
+
+.active-items{display:flex;gap:5px;width:100%;justify-content:center;flex-wrap:wrap;min-height:22px}
+.badge{background:white;border-radius:8px;padding:2px 8px;font-size:12px;font-weight:800;
+  color:var(--text);box-shadow:0 2px 0 #d4c2a8;display:flex;align-items:center;gap:4px}
+
+.canvas-wrap{width:100%;background:var(--board-bg);border-radius:18px;padding:12px;
+  box-shadow:0 6px 0 #d4c2a8,0 12px 30px rgba(0,0,0,.08);
+  display:flex;flex-direction:column;align-items:center;position:relative}
+canvas{display:block;background:var(--floor);border-radius:12px;touch-action:none;
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.06)}
+.hint{margin-top:8px;font-size:13px;font-weight:700;color:var(--muted);height:18px}
+
+.overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(240,225,200,.93);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+.ov-emoji{font-size:64px}
+.ov-title{font-size:30px;font-weight:900;color:var(--text)}
+.ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
+@keyframes bounceIn{0%{transform:scale(.7)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.overlay.show .ov-emoji{animation:bounceIn .4s ease}
+</style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+<div class="wrapper">
+  <div class="header">
+    <div class="title">벽돌깨기</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="newGame()">새 게임</button>
+      <a href="../index.html" class="btn">🏠</a>
+    </div>
+  </div>
+
+  <div class="score-row">
+    <div class="score-box"><div class="score-label">레벨</div><div class="score-val" id="lvEl">1</div></div>
+    <div class="score-box"><div class="score-label">점수</div><div class="score-val" id="scEl">0</div></div>
+    <div class="score-box"><div class="score-label">생명</div><div class="score-val" id="lvsEl">❤❤❤</div></div>
+  </div>
+
+  <div class="active-items" id="activeItems"></div>
+
+  <div class="canvas-wrap">
+    <canvas id="canvas"></canvas>
+    <div class="hint" id="hintEl">▶ 탭/스페이스로 발사</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-emoji" id="ovEmoji">🎉</div>
+  <div class="ov-title" id="ovTitle">완성!</div>
+  <div class="ov-sub" id="ovSub"></div>
+  <button class="btn blue" id="ovBtn">다음</button>
+</div>
+
+<script>
+const PALETTE = ['#FF5252','#FF9F43','#FFD93D','#6BCB77','#4D96FF','#A78BFA'];
+const DARKEN  = ['#a83838','#c47820','#c4a000','#3a9a45','#2a70d4','#7c5cda'];
+
+// ── Items ──
+const ITEM_DUR = 10000;
+const ITEM_DEFS = {
+  wide:   { color:'#4D96FF', label:'길어진 패들', icon:'↔'  },
+  multi:  { color:'#A78BFA', label:'멀티볼',     icon:'●●●' },
+  life:   { color:'#FF5252', label:'생명 +1',     icon:'♥'  },
+  bomb:   { color:'#5a3e1b', label:'폭탄 공',     icon:'💣' },
+  slow:   { color:'#6BCB77', label:'느린 공',     icon:'🐢' },
+  pierce: { color:'#FFD93D', label:'관통 공',     icon:'⚡' },
+};
+function randomItem() {
+  if (Math.random() < 0.10) return 'life';
+  const types = ['wide','multi','bomb','slow','pierce'];
+  return types[Math.floor(Math.random() * types.length)];
+}
+
+// ── Levels ──
+const LEVELS = [
+  { rows:5, cols:8, pattern:'fill' },
+  { rows:6, cols:8, pattern:'gap' },
+  { rows:6, cols:8, pattern:'pyramid' },
+  { rows:7, cols:8, pattern:'chess' },
+  { rows:7, cols:8, pattern:'frame' },
+];
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const overlayEl = document.getElementById('overlay');
+const hintEl = document.getElementById('hintEl');
+const activeItemsEl = document.getElementById('activeItems');
+
+let W, H;
+let paddleX, paddleY, paddleW, paddleH, basePaddleW;
+let ballR, baseSpeed;
+let balls = [];      // [{x,y,vx,vy,attached,rotation}]
+let items = [];      // [{x,y,type}]
+let bricks = [];
+let bricksPopping = [];
+let activeItems = { wide:0, slow:0, pierce:0, bomb:false };
+let score, lives, level, gameState;
+const POP_DUR = 250;
+const ITEM_R = 14;
+
+function resize() {
+  const wrap = document.querySelector('.canvas-wrap');
+  W = Math.min(420, wrap.clientWidth - 24);
+  H = Math.round(W * 1.35);
+  canvas.width = W; canvas.height = H;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+
+  basePaddleW = Math.max(70, W * 0.2);
+  paddleW = basePaddleW;
+  paddleH = Math.max(11, W * 0.032);
+  ballR   = Math.max(7, W * 0.024);
+  baseSpeed = W * 0.011;
+}
+
+function setupLevel() {
+  const lv = LEVELS[(level - 1) % LEVELS.length];
+  const cols = lv.cols, rows = lv.rows;
+  const padX = W * 0.04;
+  const brickW = (W - padX * 2) / cols;
+  const brickH = brickW * 0.42;
+  const startY = H * 0.07;
+
+  bricks = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      let alive = true;
+      if (lv.pattern === 'gap')     alive = !(r === 2 && c >= 2 && c <= 5);
+      if (lv.pattern === 'pyramid') alive = !(c < r || c >= cols - r);
+      if (lv.pattern === 'chess')   alive = (r + c) % 2 === 0;
+      if (lv.pattern === 'frame')   alive = (r === 0 || r === rows - 1 || c === 0 || c === cols - 1);
+      if (!alive) continue;
+      bricks.push({
+        x: padX + c * brickW + 2,
+        y: startY + r * brickH + 2,
+        w: brickW - 4,
+        h: brickH - 4,
+        color: r % PALETTE.length,
+        row: r, col: c,
+        isItem: false,
+      });
+    }
+  }
+  // Mark random bricks as ? bricks
+  const numItem = Math.min(bricks.length, 2 + Math.floor(Math.random() * 3));
+  const idxs = [...bricks.keys()];
+  for (let i = idxs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [idxs[i], idxs[j]] = [idxs[j], idxs[i]];
+  }
+  for (let i = 0; i < numItem; i++) bricks[idxs[i]].isItem = true;
+
+  bricksPopping = [];
+  items = [];
+  activeItems = { wide:0, slow:0, pierce:0, bomb:false };
+  paddleW = basePaddleW;
+  paddleY = H - paddleH * 3;
+  paddleX = (W - paddleW) / 2;
+  resetBalls();
+}
+
+function resetBalls() {
+  balls = [{
+    x: paddleX + paddleW / 2,
+    y: paddleY - ballR - 2,
+    vx: 0, vy: 0,
+    attached: true,
+    rotation: 0,
+  }];
+  hintEl.textContent = '▶ 탭/스페이스로 발사';
+}
+
+function launch() {
+  if (gameState !== 'playing') return;
+  const b = balls.find(x => x.attached);
+  if (!b) return;
+  b.attached = false;
+  hintEl.textContent = '';
+  const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI / 3;
+  const speed = baseSpeed * (1 + (level - 1) * 0.1);
+  b.vx = Math.cos(angle) * speed;
+  b.vy = Math.sin(angle) * speed;
+}
+
+function popBrick(b) {
+  bricksPopping.push({
+    x: b.x, y: b.y, w: b.w, h: b.h,
+    color: b.color, isItem: b.isItem, t0: performance.now(),
+  });
+}
+
+function dropItem(b) {
+  items.push({
+    x: b.x + b.w / 2,
+    y: b.y + b.h / 2,
+    type: randomItem(),
+  });
+}
+
+function destroyBrick(idx) {
+  const b = bricks[idx];
+  bricks.splice(idx, 1);
+  popBrick(b);
+  score += 10;
+  if (b.isItem) dropItem(b);
+}
+
+function triggerBomb(hit) {
+  for (let i = bricks.length - 1; i >= 0; i--) {
+    const b = bricks[i];
+    if (Math.abs(b.row - hit.row) <= 1 && Math.abs(b.col - hit.col) <= 1) {
+      destroyBrick(i);
+    }
+  }
+}
+
+function activateItem(type) {
+  const now = performance.now();
+  switch (type) {
+    case 'wide':
+      paddleW = basePaddleW * 1.5;
+      paddleX = Math.max(0, Math.min(W - paddleW, paddleX - basePaddleW * 0.25));
+      activeItems.wide = now + ITEM_DUR;
+      break;
+    case 'multi': {
+      const src = balls.find(x => !x.attached) || balls[0];
+      if (!src) break;
+      const speed = Math.max(baseSpeed, Math.hypot(src.vx, src.vy) || baseSpeed);
+      for (let i = 0; i < 2; i++) {
+        const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI;
+        balls.push({
+          x: src.x, y: src.y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          attached: false, rotation: 0,
+        });
+      }
+      break;
+    }
+    case 'life':
+      lives++;
+      document.getElementById('lvsEl').textContent = '❤'.repeat(lives);
+      break;
+    case 'bomb':
+      activeItems.bomb = true;
+      break;
+    case 'slow':
+      activeItems.slow = now + ITEM_DUR;
+      break;
+    case 'pierce':
+      activeItems.pierce = now + ITEM_DUR;
+      break;
+  }
+}
+
+function update() {
+  if (gameState !== 'playing') return;
+  const now = performance.now();
+
+  // Active item expiry
+  if (activeItems.wide && now > activeItems.wide) {
+    activeItems.wide = 0;
+    paddleW = basePaddleW;
+    paddleX = Math.min(W - paddleW, paddleX);
+  }
+
+  const slowMul  = activeItems.slow > now ? 0.55 : 1;
+  const isPierce = activeItems.pierce > now;
+
+  // Items falling
+  for (let i = items.length - 1; i >= 0; i--) {
+    const it = items[i];
+    it.y += 1.8;
+    const cy = paddleY + paddleH / 2;
+    if (it.y >= paddleY - ITEM_R && it.y <= cy + ITEM_R &&
+        it.x > paddleX - ITEM_R * 0.6 && it.x < paddleX + paddleW + ITEM_R * 0.6) {
+      activateItem(it.type);
+      items.splice(i, 1);
+      continue;
+    }
+    if (it.y > H + 30) items.splice(i, 1);
+  }
+
+  // Balls
+  for (let bi = balls.length - 1; bi >= 0; bi--) {
+    const ball = balls[bi];
+    if (ball.attached) {
+      ball.x = paddleX + paddleW / 2;
+      ball.y = paddleY - ballR - 2;
+      continue;
+    }
+
+    ball.x += ball.vx * slowMul;
+    ball.y += ball.vy * slowMul;
+    ball.rotation += ball.vx * 0.04 * slowMul;
+
+    if (ball.x < ballR)        { ball.x = ballR;        ball.vx = Math.abs(ball.vx); }
+    if (ball.x > W - ballR)    { ball.x = W - ballR;    ball.vx = -Math.abs(ball.vx); }
+    if (ball.y < ballR)        { ball.y = ballR;        ball.vy = Math.abs(ball.vy); }
+
+    // Paddle
+    if (ball.vy > 0 &&
+        ball.y + ballR > paddleY && ball.y - ballR < paddleY + paddleH &&
+        ball.x > paddleX - ballR && ball.x < paddleX + paddleW + ballR) {
+      ball.y = paddleY - ballR;
+      const hitPos = (ball.x - paddleX) / paddleW;
+      const angle = -Math.PI / 2 + (Math.max(0, Math.min(1, hitPos)) - 0.5) * (Math.PI * 0.55);
+      const speed = Math.max(baseSpeed, Math.hypot(ball.vx, ball.vy));
+      ball.vx = Math.cos(angle) * speed;
+      ball.vy = Math.sin(angle) * speed;
+    }
+
+    if (ball.y > H + ballR) { balls.splice(bi, 1); continue; }
+
+    // Bricks
+    for (let i = bricks.length - 1; i >= 0; i--) {
+      const b = bricks[i];
+      if (ball.x + ballR > b.x && ball.x - ballR < b.x + b.w &&
+          ball.y + ballR > b.y && ball.y - ballR < b.y + b.h) {
+        destroyBrick(i);
+
+        if (activeItems.bomb) {
+          activeItems.bomb = false;
+          triggerBomb(b);
+        }
+
+        if (!isPierce) {
+          const overlapX = Math.min(ball.x + ballR - b.x, b.x + b.w - (ball.x - ballR));
+          const overlapY = Math.min(ball.y + ballR - b.y, b.y + b.h - (ball.y - ballR));
+          if (overlapX < overlapY) ball.vx = -ball.vx;
+          else ball.vy = -ball.vy;
+          break;
+        }
+      }
+    }
+
+    if (bricks.length === 0) {
+      gameState = 'win';
+      if (level < LEVELS.length) {
+        showOverlay('🎉', '레벨 완성!', `점수: ${score}`, '다음 레벨 ▶', nextLevel);
+      } else {
+        showOverlay('👑', '클리어!', `점수: ${score}`, '새 게임', newGame);
+      }
+      break;
+    }
+  }
+
+  document.getElementById('scEl').textContent = score;
+
+  // Lose
+  if (balls.length === 0 && gameState === 'playing') {
+    lives--;
+    document.getElementById('lvsEl').textContent = '❤'.repeat(Math.max(0, lives));
+    if (lives <= 0) {
+      gameState = 'lose';
+      showOverlay('💥', '게임 오버', `점수: ${score}`, '새 게임', newGame);
+    } else {
+      activeItems = { wide:0, slow:0, pierce:0, bomb:false };
+      paddleW = basePaddleW;
+      resetBalls();
+    }
+  }
+
+  renderBadges();
+}
+
+// ── Drawing ──
+function drawBrick(b, alpha=1, scale=1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const cx = b.x + b.w/2, cy = b.y + b.h/2;
+  const w = b.w * scale, h = b.h * scale;
+  const x = cx - w/2, y = cy - h/2;
+  const fillColor = b.isItem ? '#f0c040' : PALETTE[b.color];
+  const edgeColor = b.isItem ? '#a8861f' : DARKEN[b.color];
+  ctx.fillStyle = fillColor;
+  roundRect(x, y, w, h, Math.min(w, h) * 0.18);
+  ctx.fill();
+  // top highlight
+  ctx.fillStyle = 'rgba(255,255,255,0.32)';
+  roundRect(x, y, w, h * 0.4, Math.min(w, h) * 0.18);
+  ctx.fill();
+  // bottom shadow
+  ctx.fillStyle = edgeColor;
+  ctx.globalAlpha = alpha * 0.4;
+  ctx.fillRect(x + 2, y + h - 3, w - 4, 3);
+  // ? symbol
+  if (b.isItem) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'white';
+    ctx.font = `900 ${h * 0.7}px 'Nunito', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('?', cx, cy + h * 0.04);
+  }
+  ctx.restore();
+}
+
+function drawBaseball(ball) {
+  const r = ballR;
+  ctx.save();
+  ctx.translate(ball.x, ball.y);
+  ctx.rotate(ball.rotation);
+
+  // Soft drop shadow
+  ctx.shadowColor = 'rgba(0,0,0,0.3)';
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetY = 2;
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.fillStyle = '#fefcf5';
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+
+  // Outer rim
+  ctx.beginPath();
+  ctx.arc(0, 0, r - 0.5, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+  ctx.lineWidth = 0.7;
+  ctx.stroke();
+
+  // Clip to ball
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(0, 0, r, 0, Math.PI * 2);
+  ctx.clip();
+
+  ctx.strokeStyle = '#d63d3d';
+  ctx.lineWidth = Math.max(1, r * 0.12);
+  ctx.lineCap = 'round';
+
+  // Left seam — "(" curve bulging out to the left
+  ctx.beginPath();
+  ctx.moveTo(-0.55 * r, -0.78 * r);
+  ctx.quadraticCurveTo(-1.15 * r, 0, -0.55 * r, 0.78 * r);
+  ctx.stroke();
+
+  // Right seam — ")" curve bulging out to the right
+  ctx.beginPath();
+  ctx.moveTo(0.55 * r, -0.78 * r);
+  ctx.quadraticCurveTo(1.15 * r, 0, 0.55 * r, 0.78 * r);
+  ctx.stroke();
+
+  // Perpendicular stitches along each seam
+  ctx.lineWidth = Math.max(1, r * 0.07);
+  const nStitch = 5;
+  const tickLen = r * 0.20;
+  for (let i = 0; i < nStitch; i++) {
+    const t = (i + 0.5) / nStitch;
+    // Bezier point + tangent for left seam
+    const lx = -r * (0.55 + 1.2 * t * (1 - t));
+    const ly = r * 0.78 * (2 * t - 1);
+    const ldx = -r * 1.2 * (1 - 2 * t);
+    const ldy = r * 1.56;
+    const lm = Math.hypot(ldx, ldy);
+    const lnx = -ldy / lm, lny = ldx / lm;
+    ctx.beginPath();
+    ctx.moveTo(lx + lnx * tickLen * 0.5, ly + lny * tickLen * 0.5);
+    ctx.lineTo(lx - lnx * tickLen * 0.5, ly - lny * tickLen * 0.5);
+    ctx.stroke();
+    // Right seam (mirror)
+    const rx = -lx;
+    const ry = ly;
+    const rnx = -lnx;
+    const rny = lny;
+    ctx.beginPath();
+    ctx.moveTo(rx + rnx * tickLen * 0.5, ry + rny * tickLen * 0.5);
+    ctx.lineTo(rx - rnx * tickLen * 0.5, ry - rny * tickLen * 0.5);
+    ctx.stroke();
+  }
+
+  ctx.restore(); // clip
+  ctx.restore(); // translate/rotate
+}
+
+function drawItem(it) {
+  const def = ITEM_DEFS[it.type];
+  ctx.save();
+  // Shadow + circle
+  ctx.shadowColor = 'rgba(0,0,0,0.3)';
+  ctx.shadowBlur = 5;
+  ctx.shadowOffsetY = 2;
+  ctx.beginPath();
+  ctx.arc(it.x, it.y, ITEM_R, 0, Math.PI * 2);
+  ctx.fillStyle = def.color;
+  ctx.fill();
+  ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+  // Inner highlight
+  ctx.beginPath();
+  ctx.arc(it.x - 4, it.y - 4, ITEM_R * 0.4, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  ctx.fill();
+  // Icon
+  ctx.fillStyle = 'white';
+  ctx.font = `900 ${ITEM_R * 0.95}px 'Nunito', sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(def.icon, it.x, it.y + 1);
+  ctx.restore();
+}
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+  for (const b of bricks) drawBrick(b);
+
+  const now = performance.now();
+  bricksPopping = bricksPopping.filter(p => now - p.t0 < POP_DUR);
+  for (const p of bricksPopping) {
+    const t = (now - p.t0) / POP_DUR;
+    drawBrick(p, 1 - t, 1 + t * 0.3);
+  }
+
+  for (const it of items) drawItem(it);
+
+  // Paddle
+  ctx.fillStyle = '#5a3e1b';
+  roundRect(paddleX, paddleY, paddleW, paddleH, paddleH / 2);
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.32)';
+  roundRect(paddleX + 4, paddleY + 2, paddleW - 8, paddleH * 0.4, paddleH * 0.2);
+  ctx.fill();
+
+  for (const b of balls) drawBaseball(b);
+}
+
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function renderBadges() {
+  const now = performance.now();
+  const list = [];
+  if (activeItems.wide > now)   list.push({ icon:'↔',  label:Math.ceil((activeItems.wide   - now)/1000) + 's' });
+  if (activeItems.slow > now)   list.push({ icon:'🐢', label:Math.ceil((activeItems.slow   - now)/1000) + 's' });
+  if (activeItems.pierce > now) list.push({ icon:'⚡', label:Math.ceil((activeItems.pierce - now)/1000) + 's' });
+  if (activeItems.bomb)         list.push({ icon:'💣', label:'대기' });
+
+  // diff render to avoid flicker
+  const newHTML = list.map(b => `<div class="badge"><span>${b.icon}</span>${b.label}</div>`).join('');
+  if (activeItemsEl.dataset.cache !== newHTML) {
+    activeItemsEl.innerHTML = newHTML;
+    activeItemsEl.dataset.cache = newHTML;
+  }
+}
+
+function loop() {
+  update();
+  render();
+  requestAnimationFrame(loop);
+}
+
+// ── Controls ──
+function setPaddleFromX(clientX) {
+  const rect = canvas.getBoundingClientRect();
+  paddleX = Math.max(0, Math.min(W - paddleW, clientX - rect.left - paddleW / 2));
+}
+
+canvas.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  canvas.setPointerCapture(e.pointerId);
+  setPaddleFromX(e.clientX);
+  if (gameState === 'playing') launch();
+}, { passive:false });
+
+canvas.addEventListener('pointermove', e => {
+  if (gameState !== 'playing') return;
+  setPaddleFromX(e.clientX);
+});
+
+document.addEventListener('keydown', e => {
+  if (gameState !== 'playing') return;
+  if (e.key === 'ArrowLeft')       { paddleX = Math.max(0, paddleX - 24); e.preventDefault(); }
+  else if (e.key === 'ArrowRight') { paddleX = Math.min(W - paddleW, paddleX + 24); e.preventDefault(); }
+  else if (e.key === ' ')          { launch(); e.preventDefault(); }
+});
+
+// ── Game state ──
+function newGame() {
+  level = 1; score = 0; lives = 3; gameState = 'playing';
+  document.getElementById('lvEl').textContent = level;
+  document.getElementById('scEl').textContent = score;
+  document.getElementById('lvsEl').textContent = '❤'.repeat(lives);
+  overlayEl.classList.remove('show');
+  setupLevel();
+}
+
+function nextLevel() {
+  level++;
+  document.getElementById('lvEl').textContent = level;
+  gameState = 'playing';
+  overlayEl.classList.remove('show');
+  setupLevel();
+}
+
+function showOverlay(emoji, title, sub, btnText, btnFn) {
+  document.getElementById('ovEmoji').textContent = emoji;
+  document.getElementById('ovTitle').textContent = title;
+  document.getElementById('ovSub').textContent = sub;
+  const btn = document.getElementById('ovBtn');
+  btn.textContent = btnText;
+  btn.onclick = btnFn;
+  overlayEl.classList.add('show');
+}
+
+window.addEventListener('resize', () => { resize(); setupLevel(); });
+
+resize();
+newGame();
+loop();
+</script>
+</body>
+</html>
