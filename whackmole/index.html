@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>두더지 잡기 🔨</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script defer src="../assets/sfx.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff9f0;--board-bg:#f0e6d3;--text:#5a3e1b;--muted:#b0996e;
+  --grass:#7BC57A;--grass-dk:#4a9b48;--dirt:#8b6914;--dirt-dk:#3a2a04}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+  overflow:hidden;}
+
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.09;animation:floatShape 8s ease-in-out infinite}
+.shape:nth-child(1){width:220px;height:220px;background:#7BC57A;top:-60px;left:-60px}
+.shape:nth-child(2){width:160px;height:160px;background:#FF9F43;top:55%;right:-40px;animation-delay:2s}
+.shape:nth-child(3){width:110px;height:110px;background:#FFD93D;bottom:-30px;left:30%;animation-delay:4s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+.wrapper{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px}
+.header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.title{font-size:clamp(28px,8vw,40px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,#7BC57A 0%,#FF9F43 50%,#FF5252 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,0.07))}
+.btn{background:#e8d8c0;color:#8b6914;border:none;border-radius:10px;padding:8px 13px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 3px 0 #d4c2a8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d4c2a8}
+.btn.green{background:#6BCB77;color:white;box-shadow:0 3px 0 #3a9a45}
+.btn.green:active{box-shadow:0 1px 0 #3a9a45}
+
+.score-row{display:flex;gap:6px;width:100%}
+.score-box{flex:1;background:var(--board-bg);border-radius:12px;padding:6px 8px;text-align:center;box-shadow:0 3px 0 #d4c2a8}
+.score-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.score-val{font-size:20px;font-weight:900;color:var(--text);line-height:1.1}
+.score-box.combo .score-val{color:#FF9F43}
+.score-box.time .score-val{color:#4D96FF;transition:color .2s}
+.score-box.time.urgent .score-val{color:#FF5252;animation:pulseT .5s ease-in-out infinite}
+@keyframes pulseT{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+.timer-bar-wrap{width:100%;height:6px;background:rgba(176,153,110,.25);border-radius:3px;overflow:hidden}
+.timer-bar{height:100%;width:100%;background:linear-gradient(90deg,#FF5252 0%,#FFD93D 50%,#6BCB77 100%);
+  background-size:200% 100%;background-position:right;
+  transition:width .3s linear,background-position .3s linear;border-radius:3px}
+
+.board-wrap{width:100%;border-radius:18px;padding:18px;
+  box-shadow:0 6px 0 var(--grass-dk),0 12px 30px rgba(0,0,0,.12);
+  position:relative;overflow:hidden;
+  background-color:#7BC57A;
+  background-image:
+    /* grass tufts pattern */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M9 58 Q9 48 8 40 M13 60 Q13 50 14 42' stroke='%234a9b48' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M29 64 Q29 54 28 46 M33 62 Q33 52 34 44' stroke='%23589744' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M55 60 Q55 50 56 42 M59 64 Q59 54 58 46' stroke='%234a9b48' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Cpath d='M68 18 Q68 8 67 0 M72 16 Q72 6 73 -2' stroke='%23589744' stroke-width='1.3' fill='none' stroke-linecap='round'/%3E%3Cpath d='M18 14 Q18 4 17 -4 M22 12 Q22 2 23 -6' stroke='%234a9b48' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='40' cy='28' r='1.6' fill='%23FFD93D'/%3E%3Ccircle cx='40' cy='28' r='0.6' fill='%23FF9F43'/%3E%3Ccircle cx='66' cy='38' r='1.3' fill='%23FFB5B5'/%3E%3Ccircle cx='4' cy='32' r='1.1' fill='%23FFE6F0'/%3E%3C/svg%3E"),
+    /* soft top highlight + bottom shade */
+    linear-gradient(180deg, rgba(255,255,255,.14) 0%, transparent 35%, rgba(0,0,0,.08) 100%);
+  background-repeat:repeat, no-repeat;
+}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative;z-index:1}
+
+.hole{aspect-ratio:1;position:relative;cursor:pointer;
+  overflow:hidden;border-radius:14px;
+  -webkit-tap-highlight-color:transparent}
+
+/* Back of hole: dirt mound + grass shadow at edge + dark interior */
+.hole-bg{position:absolute;inset:0;z-index:1;pointer-events:none;
+  background-image:
+    /* deep interior */
+    radial-gradient(ellipse 50% 14% at center 80%, rgba(20,12,4,.95) 0%, rgba(20,12,4,.6) 35%, transparent 70%),
+    /* dirt mound back */
+    radial-gradient(ellipse 70% 30% at center 92%, #8b6914 5%, #6a4f0f 38%, #5a4408 60%, transparent 78%),
+    /* grass shadow (darker green ring around the hole edge) */
+    radial-gradient(ellipse 76% 18% at center 76%, transparent 65%, rgba(38,82,32,.55) 76%, transparent 92%);
+}
+
+.mole{position:absolute;left:14%;right:14%;bottom:14%;aspect-ratio:1;
+  transform:translateY(125%);transition:transform .28s cubic-bezier(.5,1.7,.5,1);
+  pointer-events:none;z-index:2}
+.mole.up{transform:translateY(0%)}
+.mole.hit{transition:transform .25s ease-out, opacity .25s ease-out;
+  transform:translateY(0%) scale(.5) rotate(8deg);opacity:0}
+
+/* Front of hole: dirt rim with sunlight highlight (hides mole's bottom) */
+.hole-fg{position:absolute;left:0;right:0;bottom:0;height:32%;z-index:3;pointer-events:none;
+  background-image:
+    /* sunlight highlight on top edge of dirt rim */
+    radial-gradient(ellipse 60% 16% at center 12%, rgba(255,255,255,.34) 0%, transparent 70%),
+    /* dirt rim front */
+    radial-gradient(ellipse 86% 100% at center 5%, #8b6914 0%, #6a4f0f 35%, #4a3408 65%, transparent 92%);
+}
+.mole svg{width:100%;height:100%;display:block;
+  filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+
+/* Default mole colors */
+.mole .m-ear-out{fill:#5a3924}
+.mole .m-body{fill:#8B5A3C}
+.mole .m-snout{fill:#A87852}
+.mole .m-eye{fill:#222}
+.mole .m-nose{fill:#FF8888}
+.mole .m-fuse{display:none}
+
+/* Golden mole */
+.mole.golden .m-body{fill:#FFD93D}
+.mole.golden .m-snout{fill:#FFC100}
+.mole.golden .m-ear-out{fill:#a88a00}
+.mole.golden .m-nose{fill:#FF9F43}
+
+/* Bomb mole */
+.mole.bomb .m-body{fill:#3a3a3a}
+.mole.bomb .m-snout{fill:#5a5a5a}
+.mole.bomb .m-ear-out{fill:#1a1a1a}
+.mole.bomb .m-eye{fill:#FF5252}
+.mole.bomb .m-nose{fill:#888}
+.mole.bomb .m-fuse{display:inline;animation:fuseFlick .25s ease-in-out infinite}
+@keyframes fuseFlick{0%,100%{stroke:#FFD93D}50%{stroke:#FF5252}}
+
+.score-popup{position:absolute;top:12%;left:50%;transform:translateX(-50%);
+  font-size:clamp(20px,5vw,28px);font-weight:900;
+  text-shadow:0 2px 0 rgba(0,0,0,.5),0 0 8px rgba(0,0,0,.3);
+  pointer-events:none;z-index:5;animation:scoreFloat .9s ease-out forwards;color:#FFD93D;white-space:nowrap}
+.score-popup.negative{color:#FF5252}
+.score-popup.golden{color:#FF9F43}
+@keyframes scoreFloat{
+  0%{opacity:1;transform:translate(-50%,30%) scale(.6)}
+  20%{transform:translate(-50%,0%) scale(1.15)}
+  100%{opacity:0;transform:translate(-50%,-90%) scale(1)}
+}
+
+.hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:white;font-size:clamp(18px,5vw,24px);font-weight:900;
+  text-shadow:0 2px 4px rgba(0,0,0,.4);letter-spacing:-.5px;
+  z-index:10;cursor:pointer;background:rgba(0,0,0,.22);border-radius:10px;
+  -webkit-tap-highlight-color:transparent;transition:background .15s}
+.hint:active{background:rgba(0,0,0,.32)}
+.hint::after{content:"";position:absolute;width:80px;height:80px;border-radius:50%;
+  background:rgba(255,255,255,.15);animation:hintPulse 1.6s ease-in-out infinite;z-index:-1}
+@keyframes hintPulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(1.4);opacity:0}}
+
+.overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(240,225,200,.93);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+.ov-emoji{font-size:64px}
+.ov-title{font-size:30px;font-weight:900;color:var(--text)}
+.ov-sub{font-size:15px;font-weight:700;color:var(--muted)}
+@keyframes bounceIn{0%{transform:scale(.7)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.overlay.show .ov-emoji{animation:bounceIn .4s ease}
+.sfx-btn{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));right:14px;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(0,0,0,.1);background:rgba(255,255,255,.95);color:#5a3e1b;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);z-index:60;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .1s,box-shadow .1s}
+.sfx-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+</style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+<div class="wrapper">
+  <div class="header">
+    <div class="title">두더지 잡기</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="startGame()" title="다시 시작">↺</button>
+      <a href="../index.html" class="btn">🏠</a>
+    </div>
+  </div>
+
+  <div class="score-row">
+    <div class="score-box"><div class="score-label">점수</div><div class="score-val" id="scoreEl">0</div></div>
+    <div class="score-box combo"><div class="score-label">콤보</div><div class="score-val" id="comboEl">0</div></div>
+    <div class="score-box time" id="timeBox"><div class="score-label">시간</div><div class="score-val" id="timeEl">60</div></div>
+  </div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+
+  <div class="board-wrap">
+    <div class="grid" id="grid"></div>
+    <div class="hint" id="hint" onclick="startGame()">▶ 탭하면 시작!</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-emoji">🎉</div>
+  <div class="ov-title">게임 종료!</div>
+  <div class="ov-sub" id="ovSub">점수: 0</div>
+  <button class="btn green" onclick="startGame()">다시 하기</button>
+  <a href="../index.html" class="btn">🏠 홈으로</a>
+</div>
+
+<button class="sfx-btn" data-sfx-toggle onclick="toggleSfx(this)" aria-label="소리">🔊</button>
+
+<script>
+const HOLES = 9;
+const GAME_TIME = 60;
+
+let score = 0, time = GAME_TIME, combo = 0;
+let best = +localStorage.getItem('mole-best') || 0;
+let gameRunning = false;
+let spawnTimer, gameTimer;
+let activeMoles = new Set();
+
+const grid = document.getElementById('grid');
+const overlayEl = document.getElementById('overlay');
+const hintEl = document.getElementById('hint');
+
+// Build holes & moles
+const MOLE_SVG = `
+  <svg viewBox="0 0 100 100">
+    <ellipse class="m-ear-out" cx="25" cy="38" rx="9" ry="7"/>
+    <ellipse cx="25" cy="38" rx="5" ry="3.5" fill="#FFB5B5"/>
+    <ellipse class="m-ear-out" cx="75" cy="38" rx="9" ry="7"/>
+    <ellipse cx="75" cy="38" rx="5" ry="3.5" fill="#FFB5B5"/>
+    <ellipse class="m-body" cx="50" cy="58" rx="42" ry="40"/>
+    <ellipse class="m-snout" cx="50" cy="68" rx="22" ry="18"/>
+    <ellipse class="m-eye" cx="38" cy="50" rx="5" ry="6"/>
+    <ellipse class="m-eye" cx="62" cy="50" rx="5" ry="6"/>
+    <circle cx="36.5" cy="48" r="1.6" fill="white"/>
+    <circle cx="60.5" cy="48" r="1.6" fill="white"/>
+    <ellipse class="m-nose" cx="50" cy="62" rx="5" ry="4"/>
+    <circle cx="48.5" cy="60.5" r="1" fill="rgba(255,255,255,.7)"/>
+    <path d="M 44 72 Q 50 76 56 72" stroke="#5a3924" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <line x1="20" y1="64" x2="32" y2="63" stroke="#5a3924" stroke-width="0.7"/>
+    <line x1="20" y1="68" x2="32" y2="68" stroke="#5a3924" stroke-width="0.7"/>
+    <line x1="80" y1="64" x2="68" y2="63" stroke="#5a3924" stroke-width="0.7"/>
+    <line x1="80" y1="68" x2="68" y2="68" stroke="#5a3924" stroke-width="0.7"/>
+    <path class="m-fuse" d="M 50 18 Q 53 12 50 6" stroke="#FFD93D" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <circle class="m-fuse" cx="50" cy="6" r="2" fill="#FF5252"/>
+  </svg>`;
+
+for (let i = 0; i < HOLES; i++) {
+  const hole = document.createElement('div');
+  hole.className = 'hole';
+  hole.dataset.idx = i;
+  hole.innerHTML = `
+    <div class="hole-bg"></div>
+    <div class="mole">${MOLE_SVG}</div>
+    <div class="hole-fg"></div>
+  `;
+  hole.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    whack(i);
+  }, { passive: false });
+  grid.appendChild(hole);
+}
+const moles = grid.querySelectorAll('.mole');
+
+function updateUI() {
+  document.getElementById('scoreEl').textContent = score;
+  document.getElementById('comboEl').textContent = combo;
+  document.getElementById('timeEl').textContent = time;
+  document.getElementById('timerBar').style.width = (time / GAME_TIME * 100) + '%';
+  document.getElementById('timeBox').classList.toggle('urgent', time <= 10 && time > 0);
+}
+
+function startGame() {
+  clearTimeout(spawnTimer);
+  clearInterval(gameTimer);
+  activeMoles.clear();
+  moles.forEach(m => m.classList.remove('up','hit','golden','bomb'));
+
+  score = 0; time = GAME_TIME; combo = 0;
+  gameRunning = true;
+  updateUI();
+  hintEl.style.display = 'none';
+  overlayEl.classList.remove('show');
+
+  scheduleSpawn();
+  gameTimer = setInterval(() => {
+    time--;
+    updateUI();
+    if (time <= 0) endGame();
+  }, 1000);
+}
+
+function scheduleSpawn() {
+  if (!gameRunning) return;
+  const elapsed = GAME_TIME - time;
+  const baseDelay = Math.max(420, 1300 - elapsed * 14);
+  const delay = baseDelay + Math.random() * 280;
+  spawnTimer = setTimeout(() => {
+    spawnMole();
+    scheduleSpawn();
+  }, delay);
+}
+
+function spawnMole() {
+  const empty = [];
+  for (let i = 0; i < HOLES; i++) if (!activeMoles.has(i)) empty.push(i);
+  if (!empty.length) return;
+  const hole = empty[Math.floor(Math.random() * empty.length)];
+
+  const r = Math.random();
+  let type = 'normal';
+  if (r < 0.08) type = 'bomb';
+  else if (r < 0.20) type = 'golden';
+
+  showMole(hole, type);
+}
+
+function showMole(holeIdx, type) {
+  activeMoles.add(holeIdx);
+  const moleEl = moles[holeIdx];
+  moleEl.classList.remove('hit', 'golden', 'bomb');
+  if (type !== 'normal') moleEl.classList.add(type);
+  moleEl.dataset.type = type;
+
+  requestAnimationFrame(() => moleEl.classList.add('up'));
+
+  const lifetime = type === 'bomb' ? 1500 : type === 'golden' ? 850 : 1100;
+  setTimeout(() => {
+    if (activeMoles.has(holeIdx) && !moleEl.classList.contains('hit')) {
+      moleEl.classList.remove('up');
+      activeMoles.delete(holeIdx);
+      if (type !== 'bomb') {
+        combo = 0;
+        updateUI();
+      }
+    }
+  }, lifetime);
+}
+
+function whack(holeIdx) {
+  if (!gameRunning) return;
+  if (!activeMoles.has(holeIdx)) return;
+  const moleEl = moles[holeIdx];
+  if (!moleEl.classList.contains('up') || moleEl.classList.contains('hit')) return;
+
+  const type = moleEl.dataset.type;
+  let pts = 0;
+  if (type === 'bomb') {
+    pts = -20;
+    score = Math.max(0, score + pts);
+    combo = 0;
+    if (window.SFX) SFX.error();
+  } else {
+    const base = type === 'golden' ? 30 : 10;
+    combo++;
+    const mult = 1 + Math.min(4, Math.floor(combo / 3));
+    pts = base * mult;
+    score += pts;
+    if (window.SFX) (type === 'golden' ? SFX.success() : SFX.pop());
+  }
+
+  moleEl.classList.remove('up');
+  moleEl.classList.add('hit');
+  showScorePopup(holeIdx, pts, type);
+  setTimeout(() => activeMoles.delete(holeIdx), 250);
+  updateUI();
+}
+
+function showScorePopup(holeIdx, pts, type) {
+  const hole = grid.children[holeIdx];
+  const popup = document.createElement('div');
+  popup.className = 'score-popup' + (pts < 0 ? ' negative' : (type === 'golden' ? ' golden' : ''));
+  popup.textContent = (pts > 0 ? '+' : '') + pts;
+  hole.appendChild(popup);
+  setTimeout(() => popup.remove(), 900);
+}
+
+function endGame() {
+  gameRunning = false;
+  clearTimeout(spawnTimer);
+  clearInterval(gameTimer);
+  moles.forEach(m => m.classList.remove('up'));
+  activeMoles.clear();
+
+  if (score > best) {
+    best = score;
+    try { localStorage.setItem('mole-best', best); } catch (_) {}
+  }
+  hintEl.style.display = '';
+  hintEl.textContent = '▶ 다시 시작!';
+  if (window.SFX) SFX.win();
+  document.getElementById('ovSub').textContent = `점수: ${score} · 최고: ${best}`;
+  overlayEl.classList.add('show');
+}
+
+updateUI();
+</script>
+</body>
+</html>

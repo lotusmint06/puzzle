@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>하노이 탑 🗼</title>
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<script defer src="../assets/sfx.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff9f0;--board-bg:#f0e6d3;--text:#5a3e1b;--muted:#b0996e;
+  --wood:#8b6914;--wood-dk:#5a4408;--peg:#7a5b1c}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);
+  min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  padding:calc(10px + env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));
+  overflow:hidden;}
+
+.bg-shapes{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.shape{position:absolute;border-radius:50%;opacity:.09;animation:floatShape 8s ease-in-out infinite}
+.shape:nth-child(1){width:220px;height:220px;background:#FF5252;top:-60px;left:-60px}
+.shape:nth-child(2){width:160px;height:160px;background:#4D96FF;top:55%;right:-40px;animation-delay:2s}
+.shape:nth-child(3){width:110px;height:110px;background:#FFD93D;bottom:-30px;left:30%;animation-delay:4s}
+@keyframes floatShape{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
+.wrapper{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;max-width:440px}
+.header{display:flex;align-items:center;justify-content:space-between;width:100%}
+.title{font-size:clamp(28px,8vw,40px);font-weight:900;letter-spacing:-1px;
+  background:linear-gradient(135deg,#FF5252 0%,#FFD93D 33%,#6BCB77 66%,#4D96FF 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 2px 0 rgba(0,0,0,0.07))}
+.btn{background:#e8d8c0;color:#8b6914;border:none;border-radius:10px;padding:8px 13px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 3px 0 #d4c2a8;text-decoration:none;display:inline-flex;align-items:center;gap:4px;
+  transition:transform .1s,box-shadow .1s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #d4c2a8}
+.btn.blue{background:#4D96FF;color:white;box-shadow:0 3px 0 #2a70d4}
+.btn.blue:active{box-shadow:0 1px 0 #2a70d4}
+
+.diff-bar{width:100%;display:flex;gap:5px;background:var(--board-bg);border-radius:14px;padding:5px;box-shadow:0 3px 0 #d4c2a8}
+.diff-btn{flex:1;background:transparent;color:var(--muted);border:none;border-radius:9px;
+  padding:7px 4px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;
+  transition:all .15s;-webkit-tap-highlight-color:transparent}
+.diff-btn.active{background:#4D96FF;color:white;box-shadow:0 2px 0 #2a70d4}
+
+.score-row{display:flex;gap:6px;width:100%}
+.score-box{flex:1;background:var(--board-bg);border-radius:12px;padding:6px 8px;text-align:center;box-shadow:0 3px 0 #d4c2a8}
+.score-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.score-val{font-size:20px;font-weight:900;color:var(--text);line-height:1.1}
+.score-box.optimal .score-val{color:#6BCB77}
+.score-box.over .score-val{color:#FF9F43}
+
+.board-wrap{width:100%;background:linear-gradient(180deg,#FFF7E5 0%,#FCEBC4 100%);
+  border-radius:18px;padding:14px;
+  box-shadow:0 6px 0 #d4c2a8,0 12px 30px rgba(0,0,0,.08)}
+#board{width:100%;display:block;touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer}
+
+.peg-zone{cursor:pointer}
+.peg-hover{stroke:#4D96FF;stroke-width:3;fill:rgba(77,150,255,.08);rx:14}
+
+.disk{transition:transform .35s cubic-bezier(.5,1.5,.5,1);
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+.disk.lifted{filter:drop-shadow(0 4px 6px rgba(0,0,0,.3));}
+
+.hint{margin-top:8px;font-size:13px;font-weight:700;color:var(--muted);text-align:center;height:18px}
+
+.overlay{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;
+  background:rgba(240,225,200,.93);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.show{opacity:1;pointer-events:all}
+.ov-emoji{font-size:64px}
+.ov-title{font-size:30px;font-weight:900;color:var(--text)}
+.ov-sub{font-size:15px;font-weight:700;color:var(--muted);text-align:center;line-height:1.5}
+@keyframes bounceIn{0%{transform:scale(.7)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.overlay.show .ov-emoji{animation:bounceIn .4s ease}
+.sfx-btn{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));right:14px;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(0,0,0,.1);background:rgba(255,255,255,.95);color:#5a3e1b;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18);z-index:60;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .1s,box-shadow .1s}
+.sfx-btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.18)}
+</style>
+</head>
+<body>
+<div class="bg-shapes"><div class="shape"></div><div class="shape"></div><div class="shape"></div></div>
+<div class="wrapper">
+  <div class="header">
+    <div class="title">하노이 탑</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" onclick="resetGame()">↺ 다시</button>
+      <a href="../index.html" class="btn">🏠</a>
+    </div>
+  </div>
+
+  <div class="diff-bar" id="diffBar">
+    <button class="diff-btn" data-n="3">3</button>
+    <button class="diff-btn active" data-n="4">4</button>
+    <button class="diff-btn" data-n="5">5</button>
+    <button class="diff-btn" data-n="6">6</button>
+    <button class="diff-btn" data-n="7">7</button>
+  </div>
+
+  <div class="score-row">
+    <div class="score-box"><div class="score-label">이동</div><div class="score-val" id="movesEl">0</div></div>
+    <div class="score-box optimal"><div class="score-label">최소</div><div class="score-val" id="optEl">15</div></div>
+    <div class="score-box over"><div class="score-label">차이</div><div class="score-val" id="diffEl">0</div></div>
+  </div>
+
+  <div class="board-wrap">
+    <svg id="board" viewBox="0 0 400 280">
+      <!-- Base -->
+      <rect x="14" y="240" width="372" height="22" rx="6" fill="#8b6914"/>
+      <rect x="14" y="240" width="372" height="6" rx="3" fill="rgba(255,255,255,.25)"/>
+
+      <!-- Pegs -->
+      <g id="pegs">
+        <rect x="93"  y="50" width="8" height="195" rx="4" fill="#7a5b1c"/>
+        <rect x="196" y="50" width="8" height="195" rx="4" fill="#7a5b1c"/>
+        <rect x="299" y="50" width="8" height="195" rx="4" fill="#7a5b1c"/>
+        <ellipse cx="97"  cy="50" rx="6" ry="3" fill="#9c7a30"/>
+        <ellipse cx="200" cy="50" rx="6" ry="3" fill="#9c7a30"/>
+        <ellipse cx="303" cy="50" rx="6" ry="3" fill="#9c7a30"/>
+      </g>
+
+      <!-- Hover/select highlight -->
+      <rect id="hl" class="peg-hover" x="0" y="0" width="0" height="0" style="display:none;pointer-events:none" rx="14"/>
+
+      <!-- Tap zones (invisible) -->
+      <g id="zones">
+        <rect class="peg-zone" data-peg="0" x="20"  y="40" width="160" height="210" fill="transparent"/>
+        <rect class="peg-zone" data-peg="1" x="120" y="40" width="160" height="210" fill="transparent"/>
+        <rect class="peg-zone" data-peg="2" x="220" y="40" width="160" height="210" fill="transparent"/>
+      </g>
+
+      <!-- Disks -->
+      <g id="disks"></g>
+    </svg>
+    <div class="hint" id="hintEl">기둥을 탭해서 디스크를 옮겨요</div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov-emoji">🏆</div>
+  <div class="ov-title" id="ovTitle">완성!</div>
+  <div class="ov-sub" id="ovSub"></div>
+  <button class="btn blue" onclick="resetGame()" style="margin-top:4px">↺ 다시 도전</button>
+  <a href="../index.html" class="btn">🏠 홈으로</a>
+</div>
+
+<button class="sfx-btn" data-sfx-toggle onclick="toggleSfx(this)" aria-label="소리">🔊</button>
+
+<script>
+// Board layout
+const PEG_X = [97, 200, 303];   // peg center x
+const BASE_Y = 240;             // top of base
+const DISK_H = 22;              // disk height
+const DISK_MIN_W = 28;          // smallest disk width
+const DISK_W_STEP = 16;         // width increment per size
+const DISK_COLORS = ['#FF5252','#FF9F43','#FFD93D','#6BCB77','#4D96FF','#A78BFA','#FF85A2'];
+const DISK_DARKEN = ['#a83838','#c47820','#c4a000','#3a9a45','#2a70d4','#7c5cda','#c45f80'];
+
+let numDisks = 4;
+let pegs = [[], [], []];   // each peg: array of disk sizes from bottom to top
+let selected = null;
+let moves = 0;
+let won = false;
+const diskEls = {};
+
+const svg = document.getElementById('board');
+const disksGroup = document.getElementById('disks');
+const hl = document.getElementById('hl');
+const overlayEl = document.getElementById('overlay');
+const hintEl = document.getElementById('hintEl');
+
+function resetGame() {
+  pegs = [[], [], []];
+  for (let s = numDisks; s >= 1; s--) pegs[0].push(s);
+  selected = null;
+  moves = 0;
+  won = false;
+  overlayEl.classList.remove('show');
+  hintEl.textContent = '기둥을 탭해서 디스크를 옮겨요';
+  buildDisks();
+  updateUI();
+}
+
+function setDifficulty(n) {
+  numDisks = n;
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.toggle('active', +b.dataset.n === n);
+  });
+  resetGame();
+}
+
+function buildDisks() {
+  disksGroup.innerHTML = '';
+  for (const k in diskEls) delete diskEls[k];
+  for (let s = 1; s <= numDisks; s++) {
+    const w = DISK_MIN_W + s * DISK_W_STEP;
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.classList.add('disk');
+    g.dataset.size = s;
+    g.innerHTML = `
+      <rect width="${w}" height="${DISK_H}" rx="${DISK_H/2}" fill="${DISK_COLORS[(s-1) % DISK_COLORS.length]}"/>
+      <rect width="${w}" height="${DISK_H * 0.4}" rx="${DISK_H/2}" fill="rgba(255,255,255,0.28)"/>
+      <rect y="${DISK_H - 4}" width="${w}" height="4" rx="2" fill="${DISK_DARKEN[(s-1) % DISK_DARKEN.length]}" opacity="0.45"/>
+      <text x="${w/2}" y="${DISK_H/2 + 5}" text-anchor="middle" font-size="${DISK_H * 0.55}" font-weight="900" fill="rgba(255,255,255,0.85)" font-family="Nunito,sans-serif">${s}</text>
+    `;
+    disksGroup.appendChild(g);
+    diskEls[s] = g;
+  }
+  positionDisks(false);
+  // Enable transition on next frame
+  requestAnimationFrame(() => {
+    Object.values(diskEls).forEach(el => el.style.willChange = 'transform');
+  });
+}
+
+function diskWidth(s) { return DISK_MIN_W + s * DISK_W_STEP; }
+
+function positionDisks(animate=true) {
+  for (let p = 0; p < 3; p++) {
+    pegs[p].forEach((s, j) => {
+      const x = PEG_X[p];
+      const w = diskWidth(s);
+      const y = BASE_Y - DISK_H * (j + 1) - 1;
+      const el = diskEls[s];
+      const isSel = (p === selected && j === pegs[p].length - 1);
+      const liftY = isSel ? y - 14 : y;
+      el.classList.toggle('lifted', isSel);
+      if (!animate) el.style.transition = 'none';
+      el.setAttribute('transform', `translate(${x - w/2}, ${liftY})`);
+      if (!animate) {
+        // Re-enable transition next frame
+        requestAnimationFrame(() => { el.style.transition = ''; });
+      }
+    });
+  }
+}
+
+function updateUI() {
+  const opt = (1 << numDisks) - 1; // 2^n - 1
+  document.getElementById('movesEl').textContent = moves;
+  document.getElementById('optEl').textContent = opt;
+  document.getElementById('diffEl').textContent = Math.max(0, moves - opt);
+}
+
+function showHighlight(p) {
+  if (p === null) {
+    hl.style.display = 'none';
+    return;
+  }
+  const x = PEG_X[p];
+  hl.setAttribute('x', x - 60);
+  hl.setAttribute('y', 40);
+  hl.setAttribute('width', 120);
+  hl.setAttribute('height', 210);
+  hl.style.display = '';
+}
+
+function tapPeg(p) {
+  if (won) return;
+  if (selected === null) {
+    if (pegs[p].length === 0) {
+      if (window.SFX) SFX.error();
+      return;
+    }
+    selected = p;
+    if (window.SFX) SFX.tap();
+    showHighlight(p);
+    positionDisks();
+    return;
+  }
+  if (selected === p) {
+    // Deselect
+    selected = null;
+    showHighlight(null);
+    positionDisks();
+    return;
+  }
+  // Try to move from selected to p
+  const fromTop = pegs[selected][pegs[selected].length - 1];
+  const toTop   = pegs[p].length ? pegs[p][pegs[p].length - 1] : Infinity;
+  if (fromTop < toTop) {
+    pegs[p].push(pegs[selected].pop());
+    moves++;
+    if (window.SFX) SFX.place();
+    selected = null;
+    showHighlight(null);
+    positionDisks();
+    updateUI();
+    if (pegs[2].length === numDisks) {
+      won = true;
+      const opt = (1 << numDisks) - 1;
+      const perfect = moves === opt;
+      setTimeout(() => {
+        document.getElementById('ovTitle').textContent = perfect ? '완벽해요!' : '완성!';
+        document.getElementById('ovSub').textContent =
+          `${moves}번 만에 옮겼어요${perfect ? ' (최단 경로!)' : ` (최단 ${opt}번)`}`;
+        if (window.SFX) SFX.win();
+        overlayEl.classList.add('show');
+      }, 350);
+    }
+  } else {
+    if (window.SFX) SFX.error();
+    hintEl.textContent = '큰 디스크는 작은 디스크 위에 못 올려요';
+    setTimeout(() => { if (!won) hintEl.textContent = '기둥을 탭해서 디스크를 옮겨요'; }, 1500);
+  }
+}
+
+// Tap zones
+document.querySelectorAll('.peg-zone').forEach(z => {
+  z.addEventListener('click', () => tapPeg(+z.dataset.peg));
+});
+
+// Difficulty buttons
+document.querySelectorAll('.diff-btn').forEach(b => {
+  b.addEventListener('click', () => setDifficulty(+b.dataset.n));
+});
+
+resetGame();
+</script>
+</body>
+</html>

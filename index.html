@@ -64,7 +64,7 @@ body {
 .game-card:not(.coming-soon):hover{transform:translateY(-4px);box-shadow:0 10px 0 var(--shadow)}
 .game-card:not(.coming-soon):active{transform:translateY(3px);box-shadow:0 2px 0 var(--shadow)}
 .game-card.coming-soon{opacity:.48;cursor:default}
-.game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}.game-card:nth-child(11){animation-delay:.57s}.game-card:nth-child(12){animation-delay:.62s}.game-card:nth-child(13){animation-delay:.67s}.game-card:nth-child(14){animation-delay:.72s}
+.game-card:nth-child(1){animation-delay:.07s}.game-card:nth-child(2){animation-delay:.12s}.game-card:nth-child(3){animation-delay:.17s}.game-card:nth-child(4){animation-delay:.22s}.game-card:nth-child(5){animation-delay:.27s}.game-card:nth-child(6){animation-delay:.32s}.game-card:nth-child(7){animation-delay:.37s}.game-card:nth-child(8){animation-delay:.42s}.game-card:nth-child(9){animation-delay:.47s}.game-card:nth-child(10){animation-delay:.52s}.game-card:nth-child(11){animation-delay:.57s}.game-card:nth-child(12){animation-delay:.62s}.game-card:nth-child(13){animation-delay:.67s}.game-card:nth-child(14){animation-delay:.72s}.game-card:nth-child(15){animation-delay:.77s}.game-card:nth-child(16){animation-delay:.82s}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .cat-pill{position:absolute;top:10px;right:10px;font-size:10px;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--muted);border:1px solid var(--border);line-height:1.4}
 .mini-icon{width:72px;height:72px;border-radius:12px;box-shadow:0 3px 0 var(--shadow);flex-shrink:0;overflow:hidden;display:block}
@@ -439,6 +439,55 @@ body {
         </svg>
       </div>
       <div class="card-body"><div class="card-title">벽돌깨기</div><div class="card-desc">공으로 벽돌을 모두 깨요</div></div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
+
+    <a class="game-card" href="./whackmole/index.html">
+      <div class="cat-pill">아케이드</div>
+      <div class="mini-icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+          <rect width="72" height="72" fill="#7BC57A"/>
+          <circle cx="14" cy="12" r="1.5" fill="rgba(255,255,255,.4)"/>
+          <circle cx="58" cy="20" r="1.2" fill="rgba(255,255,255,.4)"/>
+          <circle cx="22" cy="58" r="1.2" fill="rgba(0,0,0,.06)"/>
+          <ellipse cx="36" cy="62" rx="28" ry="6" fill="#3a2a04"/>
+          <ellipse cx="36" cy="60" rx="24" ry="4" fill="#5a4408"/>
+          <ellipse cx="22" cy="34" rx="5.5" ry="4.5" fill="#5a3924"/>
+          <ellipse cx="50" cy="34" rx="5.5" ry="4.5" fill="#5a3924"/>
+          <ellipse cx="22" cy="34" rx="3" ry="2.2" fill="#FFB5B5"/>
+          <ellipse cx="50" cy="34" rx="3" ry="2.2" fill="#FFB5B5"/>
+          <ellipse cx="36" cy="46" rx="22" ry="20" fill="#8B5A3C"/>
+          <ellipse cx="36" cy="52" rx="12" ry="10" fill="#A87852"/>
+          <ellipse cx="29" cy="42" rx="2.6" ry="3.2" fill="#222"/>
+          <ellipse cx="43" cy="42" rx="2.6" ry="3.2" fill="#222"/>
+          <circle cx="28" cy="40.5" r="0.9" fill="white"/>
+          <circle cx="42" cy="40.5" r="0.9" fill="white"/>
+          <ellipse cx="36" cy="49" rx="2.6" ry="2" fill="#FF8888"/>
+          <path d="M 32 56 Q 36 59 40 56" stroke="#5a3924" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="card-body"><div class="card-title">두더지 잡기</div><div class="card-desc">튀어나오는 두더지를 빨리 잡아요</div></div>
+      <button class="play-btn">▶ 플레이</button>
+    </a>
+
+    <a class="game-card" href="./hanoi/index.html">
+      <div class="cat-pill">퍼즐</div>
+      <div class="mini-icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+          <rect width="72" height="72" fill="#FFF7E5"/>
+          <rect x="4" y="58" width="64" height="7" rx="2" fill="#8b6914"/>
+          <rect x="4" y="58" width="64" height="2" rx="1" fill="rgba(255,255,255,.35)"/>
+          <rect x="13" y="14" width="3"  height="46" rx="1.5" fill="#7a5b1c"/>
+          <rect x="34.5" y="14" width="3" height="46" rx="1.5" fill="#7a5b1c"/>
+          <rect x="56" y="14" width="3"  height="46" rx="1.5" fill="#7a5b1c"/>
+          <rect x="3"  y="50" width="23" height="6" rx="3" fill="#FF5252"/>
+          <rect x="5"  y="43" width="19" height="6" rx="3" fill="#FF9F43"/>
+          <rect x="7"  y="36" width="15" height="6" rx="3" fill="#FFD93D"/>
+          <rect x="9"  y="29" width="11" height="6" rx="3" fill="#6BCB77"/>
+          <rect x="29" y="50" width="13" height="6" rx="3" fill="#4D96FF"/>
+        </svg>
+      </div>
+      <div class="card-body"><div class="card-title">하노이 탑</div><div class="card-desc">디스크를 옮겨 탑을 만들어요</div></div>
       <button class="play-btn">▶ 플레이</button>
     </a>
 
